@@ -46,6 +46,7 @@
             this.btnBuySell = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.panel5 = new System.Windows.Forms.Panel();
+            this.btnResetDate = new System.Windows.Forms.Button();
             this.button7 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
@@ -84,6 +85,7 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(984, 53);
             this.panel1.TabIndex = 2;
+            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
             // label1
             // 
@@ -248,6 +250,7 @@
             // panel5
             // 
             this.panel5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.panel5.Controls.Add(this.btnResetDate);
             this.panel5.Controls.Add(this.button7);
             this.panel5.Controls.Add(this.button6);
             this.panel5.Controls.Add(this.label4);
@@ -256,6 +259,17 @@
             this.panel5.Name = "panel5";
             this.panel5.Size = new System.Drawing.Size(651, 158);
             this.panel5.TabIndex = 2;
+            // 
+            // btnResetDate
+            // 
+            this.btnResetDate.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnResetDate.Location = new System.Drawing.Point(353, 66);
+            this.btnResetDate.Name = "btnResetDate";
+            this.btnResetDate.Size = new System.Drawing.Size(132, 31);
+            this.btnResetDate.TabIndex = 7;
+            this.btnResetDate.Text = "Reset Market Prices";
+            this.btnResetDate.UseVisualStyleBackColor = true;
+            this.btnResetDate.Click += new System.EventHandler(this.btnResetDate_Click);
             // 
             // button7
             // 
@@ -338,5 +352,6 @@
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Panel panel6;
+        private System.Windows.Forms.Button btnResetDate;
     }
 }

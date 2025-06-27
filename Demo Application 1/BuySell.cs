@@ -215,12 +215,9 @@ namespace Demo_Application_1
 
                 if (selectedPriceUp2Date ==  false )
                     {
-                        lblMktPrice.Font = new Font(lblMktPrice.Font, FontStyle.Strikeout);
+                        lblMktPrice.Text = lblMktPrice.Text + " (Price not up to Date)";
                     }
-                    else
-                    {
-                        lblMktPrice.Font = new Font(lblMktPrice.Font, FontStyle.Regular);
-                    }
+
                 selectedCardId = Convert.ToInt32(row.Cells["cardId"].Value);
                 selectedConditionId = Convert.ToInt32(row.Cells["conditionId"].Value?.ToString());
 
@@ -367,14 +364,22 @@ namespace Demo_Application_1
             if (cbCardGame.Text == "Yugioh")
             {
                 selectedCardGame = 1;
+                panel4.BackColor = Color.DarkOrange;
             }
             if (cbCardGame.Text == "Magic")
             {
                 selectedCardGame = 2;
+                panel4.BackColor = Color.LightGray;
             }
             if (cbCardGame.Text == "Pokemon")
             {
                 selectedCardGame = 3;
+                panel4.BackColor = Color.Red;
+            }
+
+            if (tbSearchBar.Text != null)
+            {
+                LoadInventoryData(tbSearchBar.Text.Trim());
             }
         }
     }
