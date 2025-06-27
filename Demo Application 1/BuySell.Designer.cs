@@ -30,39 +30,39 @@
         {
             this.cbxProfile = new System.Windows.Forms.ComboBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.btnSettings = new System.Windows.Forms.Button();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.panel6 = new System.Windows.Forms.Panel();
+            this.btnAddCt = new System.Windows.Forms.Button();
+            this.lblSaleInfo = new System.Windows.Forms.Label();
+            this.lblMktPrice = new System.Windows.Forms.Label();
+            this.tLP_img = new System.Windows.Forms.TableLayoutPanel();
+            this.imgCardUrl = new System.Windows.Forms.PictureBox();
+            this.lblInStock = new System.Windows.Forms.Label();
+            this.panel7 = new System.Windows.Forms.Panel();
+            this.listBox1 = new System.Windows.Forms.ListBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.panel5 = new System.Windows.Forms.Panel();
             this.cbCardGame = new System.Windows.Forms.ComboBox();
             this.tbSearchBar = new System.Windows.Forms.TextBox();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.panel6 = new System.Windows.Forms.Panel();
-            this.panel7 = new System.Windows.Forms.Panel();
-            this.imgCardUrl = new System.Windows.Forms.PictureBox();
-            this.tLP_img = new System.Windows.Forms.TableLayoutPanel();
-            this.lblInStock = new System.Windows.Forms.Label();
-            this.btnSettings = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.lblMktPrice = new System.Windows.Forms.Label();
-            this.lblSaleInfo = new System.Windows.Forms.Label();
-            this.listBox1 = new System.Windows.Forms.ListBox();
-            this.btnAddCt = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
+            this.tableLayoutPanel2.SuspendLayout();
+            this.panel6.SuspendLayout();
+            this.tLP_img.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.imgCardUrl)).BeginInit();
+            this.panel7.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel5.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
-            this.panel6.SuspendLayout();
-            this.panel7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.imgCardUrl)).BeginInit();
-            this.tLP_img.SuspendLayout();
-            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // cbxProfile
@@ -84,6 +84,47 @@
             this.panel1.Size = new System.Drawing.Size(984, 65);
             this.panel1.TabIndex = 0;
             // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.panel2.Controls.Add(this.label1);
+            this.panel2.Controls.Add(this.label2);
+            this.panel2.Controls.Add(this.btnSettings);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(0, 0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(984, 65);
+            this.panel2.TabIndex = 4;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(155, 58);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(0, 13);
+            this.label1.TabIndex = 1;
+            // 
+            // label2
+            // 
+            this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(407, 19);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(158, 25);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "Seller Interface";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // btnSettings
+            // 
+            this.btnSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSettings.Location = new System.Drawing.Point(937, 3);
+            this.btnSettings.Name = "btnSettings";
+            this.btnSettings.Size = new System.Drawing.Size(44, 41);
+            this.btnSettings.TabIndex = 0;
+            this.btnSettings.UseVisualStyleBackColor = true;
+            // 
             // panel3
             // 
             this.panel3.BackColor = System.Drawing.SystemColors.AppWorkspace;
@@ -95,6 +136,123 @@
             this.panel3.Padding = new System.Windows.Forms.Padding(10);
             this.panel3.Size = new System.Drawing.Size(984, 396);
             this.panel3.TabIndex = 8;
+            // 
+            // tableLayoutPanel2
+            // 
+            this.tableLayoutPanel2.ColumnCount = 1;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.Controls.Add(this.panel6, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.panel7, 0, 1);
+            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(10, 10);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 2;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(352, 376);
+            this.tableLayoutPanel2.TabIndex = 1;
+            // 
+            // panel6
+            // 
+            this.panel6.Controls.Add(this.btnAddCt);
+            this.panel6.Controls.Add(this.lblSaleInfo);
+            this.panel6.Controls.Add(this.lblMktPrice);
+            this.panel6.Controls.Add(this.tLP_img);
+            this.panel6.Controls.Add(this.lblInStock);
+            this.panel6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel6.Location = new System.Drawing.Point(3, 3);
+            this.panel6.Name = "panel6";
+            this.panel6.Size = new System.Drawing.Size(346, 182);
+            this.panel6.TabIndex = 0;
+            // 
+            // btnAddCt
+            // 
+            this.btnAddCt.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.btnAddCt.Location = new System.Drawing.Point(164, 92);
+            this.btnAddCt.Name = "btnAddCt";
+            this.btnAddCt.Size = new System.Drawing.Size(89, 23);
+            this.btnAddCt.TabIndex = 4;
+            this.btnAddCt.Text = "Add to Cart";
+            this.btnAddCt.UseVisualStyleBackColor = true;
+            this.btnAddCt.Click += new System.EventHandler(this.btnAddCt_Click);
+            // 
+            // lblSaleInfo
+            // 
+            this.lblSaleInfo.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.lblSaleInfo.AutoSize = true;
+            this.lblSaleInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSaleInfo.Location = new System.Drawing.Point(168, 161);
+            this.lblSaleInfo.Name = "lblSaleInfo";
+            this.lblSaleInfo.Size = new System.Drawing.Size(62, 16);
+            this.lblSaleInfo.TabIndex = 3;
+            this.lblSaleInfo.Text = "Sale Info:";
+            // 
+            // lblMktPrice
+            // 
+            this.lblMktPrice.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.lblMktPrice.AutoSize = true;
+            this.lblMktPrice.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMktPrice.Location = new System.Drawing.Point(168, 56);
+            this.lblMktPrice.Name = "lblMktPrice";
+            this.lblMktPrice.Size = new System.Drawing.Size(85, 16);
+            this.lblMktPrice.TabIndex = 2;
+            this.lblMktPrice.Text = "Market Price:";
+            // 
+            // tLP_img
+            // 
+            this.tLP_img.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
+            this.tLP_img.ColumnCount = 1;
+            this.tLP_img.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tLP_img.Controls.Add(this.imgCardUrl, 0, 1);
+            this.tLP_img.Dock = System.Windows.Forms.DockStyle.Left;
+            this.tLP_img.Location = new System.Drawing.Point(0, 0);
+            this.tLP_img.Name = "tLP_img";
+            this.tLP_img.RowCount = 3;
+            this.tLP_img.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tLP_img.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tLP_img.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tLP_img.Size = new System.Drawing.Size(162, 182);
+            this.tLP_img.TabIndex = 1;
+            // 
+            // imgCardUrl
+            // 
+            this.imgCardUrl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.imgCardUrl.Location = new System.Drawing.Point(4, 5);
+            this.imgCardUrl.Name = "imgCardUrl";
+            this.imgCardUrl.Size = new System.Drawing.Size(154, 172);
+            this.imgCardUrl.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.imgCardUrl.TabIndex = 0;
+            this.imgCardUrl.TabStop = false;
+            // 
+            // lblInStock
+            // 
+            this.lblInStock.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.lblInStock.AutoSize = true;
+            this.lblInStock.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblInStock.Location = new System.Drawing.Point(168, 14);
+            this.lblInStock.Name = "lblInStock";
+            this.lblInStock.Size = new System.Drawing.Size(105, 16);
+            this.lblInStock.TabIndex = 1;
+            this.lblInStock.Text = "Amount In Stock:";
+            // 
+            // panel7
+            // 
+            this.panel7.Controls.Add(this.listBox1);
+            this.panel7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel7.Location = new System.Drawing.Point(3, 191);
+            this.panel7.Name = "panel7";
+            this.panel7.Size = new System.Drawing.Size(346, 182);
+            this.panel7.TabIndex = 1;
+            // 
+            // listBox1
+            // 
+            this.listBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.Location = new System.Drawing.Point(0, 0);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(346, 182);
+            this.listBox1.TabIndex = 0;
             // 
             // tableLayoutPanel1
             // 
@@ -156,6 +314,7 @@
             this.cbCardGame.Name = "cbCardGame";
             this.cbCardGame.Size = new System.Drawing.Size(144, 21);
             this.cbCardGame.TabIndex = 4;
+            this.cbCardGame.SelectedIndexChanged += new System.EventHandler(this.cbCardGame_SelectedIndexChanged);
             // 
             // tbSearchBar
             // 
@@ -166,163 +325,6 @@
             this.tbSearchBar.TabIndex = 1;
             this.tbSearchBar.TextChanged += new System.EventHandler(this.tbSearchBar_TextChanged);
             this.tbSearchBar.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbSearchBar_KeyDown);
-            // 
-            // tableLayoutPanel2
-            // 
-            this.tableLayoutPanel2.ColumnCount = 1;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.Controls.Add(this.panel6, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.panel7, 0, 1);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(10, 10);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 2;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(352, 376);
-            this.tableLayoutPanel2.TabIndex = 1;
-            // 
-            // panel6
-            // 
-            this.panel6.Controls.Add(this.btnAddCt);
-            this.panel6.Controls.Add(this.lblSaleInfo);
-            this.panel6.Controls.Add(this.lblMktPrice);
-            this.panel6.Controls.Add(this.tLP_img);
-            this.panel6.Controls.Add(this.lblInStock);
-            this.panel6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel6.Location = new System.Drawing.Point(3, 3);
-            this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(346, 182);
-            this.panel6.TabIndex = 0;
-            // 
-            // panel7
-            // 
-            this.panel7.Controls.Add(this.listBox1);
-            this.panel7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel7.Location = new System.Drawing.Point(3, 191);
-            this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(346, 182);
-            this.panel7.TabIndex = 1;
-            // 
-            // imgCardUrl
-            // 
-            this.imgCardUrl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imgCardUrl.Location = new System.Drawing.Point(4, 5);
-            this.imgCardUrl.Name = "imgCardUrl";
-            this.imgCardUrl.Size = new System.Drawing.Size(154, 172);
-            this.imgCardUrl.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.imgCardUrl.TabIndex = 0;
-            this.imgCardUrl.TabStop = false;
-            // 
-            // tLP_img
-            // 
-            this.tLP_img.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
-            this.tLP_img.ColumnCount = 1;
-            this.tLP_img.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tLP_img.Controls.Add(this.imgCardUrl, 0, 1);
-            this.tLP_img.Dock = System.Windows.Forms.DockStyle.Left;
-            this.tLP_img.Location = new System.Drawing.Point(0, 0);
-            this.tLP_img.Name = "tLP_img";
-            this.tLP_img.RowCount = 3;
-            this.tLP_img.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tLP_img.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tLP_img.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tLP_img.Size = new System.Drawing.Size(162, 182);
-            this.tLP_img.TabIndex = 1;
-            // 
-            // lblInStock
-            // 
-            this.lblInStock.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
-            this.lblInStock.AutoSize = true;
-            this.lblInStock.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblInStock.Location = new System.Drawing.Point(168, 14);
-            this.lblInStock.Name = "lblInStock";
-            this.lblInStock.Size = new System.Drawing.Size(105, 16);
-            this.lblInStock.TabIndex = 1;
-            this.lblInStock.Text = "Amount In Stock:";
-            // 
-            // btnSettings
-            // 
-            this.btnSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSettings.Location = new System.Drawing.Point(937, 3);
-            this.btnSettings.Name = "btnSettings";
-            this.btnSettings.Size = new System.Drawing.Size(44, 41);
-            this.btnSettings.TabIndex = 0;
-            this.btnSettings.UseVisualStyleBackColor = true;
-            // 
-            // label2
-            // 
-            this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(407, 19);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(158, 25);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "Seller Interface";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(155, 58);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(0, 13);
-            this.label1.TabIndex = 1;
-            // 
-            // panel2
-            // 
-            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.panel2.Controls.Add(this.label1);
-            this.panel2.Controls.Add(this.label2);
-            this.panel2.Controls.Add(this.btnSettings);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(0, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(984, 65);
-            this.panel2.TabIndex = 4;
-            // 
-            // lblMktPrice
-            // 
-            this.lblMktPrice.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.lblMktPrice.AutoSize = true;
-            this.lblMktPrice.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMktPrice.Location = new System.Drawing.Point(168, 56);
-            this.lblMktPrice.Name = "lblMktPrice";
-            this.lblMktPrice.Size = new System.Drawing.Size(85, 16);
-            this.lblMktPrice.TabIndex = 2;
-            this.lblMktPrice.Text = "Market Price:";
-            // 
-            // lblSaleInfo
-            // 
-            this.lblSaleInfo.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.lblSaleInfo.AutoSize = true;
-            this.lblSaleInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSaleInfo.Location = new System.Drawing.Point(168, 161);
-            this.lblSaleInfo.Name = "lblSaleInfo";
-            this.lblSaleInfo.Size = new System.Drawing.Size(62, 16);
-            this.lblSaleInfo.TabIndex = 3;
-            this.lblSaleInfo.Text = "Sale Info:";
-            // 
-            // listBox1
-            // 
-            this.listBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(0, 0);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(346, 182);
-            this.listBox1.TabIndex = 0;
-            // 
-            // btnAddCt
-            // 
-            this.btnAddCt.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.btnAddCt.Location = new System.Drawing.Point(164, 92);
-            this.btnAddCt.Name = "btnAddCt";
-            this.btnAddCt.Size = new System.Drawing.Size(89, 23);
-            this.btnAddCt.TabIndex = 4;
-            this.btnAddCt.Text = "Add to Cart";
-            this.btnAddCt.UseVisualStyleBackColor = true;
             // 
             // BuySell
             // 
@@ -337,20 +339,20 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.BuySell_FormClosed);
             this.Load += new System.EventHandler(this.BuySell_Load);
             this.panel1.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.panel3.ResumeLayout(false);
+            this.tableLayoutPanel2.ResumeLayout(false);
+            this.panel6.ResumeLayout(false);
+            this.panel6.PerformLayout();
+            this.tLP_img.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.imgCardUrl)).EndInit();
+            this.panel7.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.panel6.ResumeLayout(false);
-            this.panel6.PerformLayout();
-            this.panel7.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.imgCardUrl)).EndInit();
-            this.tLP_img.ResumeLayout(false);
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
             this.ResumeLayout(false);
 
         }
