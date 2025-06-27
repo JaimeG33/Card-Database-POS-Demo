@@ -23,7 +23,7 @@ namespace Demo_Application_1
 
         private void HomePage_Load(object sender, EventArgs e)
         {
-
+            this.WindowState = FormWindowState.Maximized;
         }
 
         private void HomePage_FormClosed(object sender, FormClosedEventArgs e)

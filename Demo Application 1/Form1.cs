@@ -110,5 +110,15 @@ namespace Demo_Application_1
                 MessageBox.Show(message);// "Connection Failed:..."
             }
         }
+
+        private void tbPswd_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                //Runs the btnLogin_Click method
+                           //(Needs the dummy paramaters)
+                btnLogin_Click(this, EventArgs.Empty);
+            }
+        }
     }
 }

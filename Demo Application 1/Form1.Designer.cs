@@ -70,6 +70,7 @@
             this.tbPswd.Name = "tbPswd";
             this.tbPswd.Size = new System.Drawing.Size(250, 20);
             this.tbPswd.TabIndex = 3;
+            this.tbPswd.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbPswd_KeyDown);
             // 
             // label3
             // 
