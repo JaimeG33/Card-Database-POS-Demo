@@ -405,7 +405,11 @@ namespace Demo_Application_1
         {
             double mathPrice = selectedMktPrice;
             
-            if (mathPrice < 0.80)
+            if (mathPrice < 0.18)
+            {
+                transactionPrice = 0.10;
+            }
+            else if (mathPrice > 0.18 && mathPrice < 0.80)
             {
                 // Round to nearest quarter (0.25)
                 transactionPrice = Math.Round(mathPrice * 4, MidpointRounding.AwayFromZero) / 4;
@@ -474,6 +478,44 @@ namespace Demo_Application_1
                 NavigationHelper.ReturnToHome(this, _homePage, ref changingTabs);
             }
         }
+        private void tbPrice_MouseClick(object sender, MouseEventArgs e)
+        {
+            UpdatePrice();
+        }
+        private void tbPrice_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Allow only digits, backspace, and delete
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true; // Block everything else
+            }
+        }
+
+        private void tbPrice_TextChanged(object sender, EventArgs e)
+        {
+            // temporarily remove handlers to prevent recursion
+            tbPrice.TextChanged -= tbPrice_TextChanged;
+            // only didgets allowed
+            string raw = new string (tbPrice.Text.Where(char.IsDigit).ToArray());
+
+            if (double.TryParse(raw, out double value))
+            {
+                value /= 100; //convert to dollars
+                tbPrice.Text = value.ToString("C2", System.Globalization.CultureInfo.CreateSpecificCulture("en-US"));
+                tbPrice.SelectionStart = tbPrice.Text.Length;
+
+                transactionPrice = value;
+            }
+            else
+            {
+                tbPrice.Text = "$0.00";
+                tbPrice.SelectionStart = tbPrice.Text.Length;
+            }
+            // Reattach handler
+            tbPrice.TextChanged += tbPrice_TextChanged;
+        }
+
+        
     }
 }
 

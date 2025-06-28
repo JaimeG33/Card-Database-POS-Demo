@@ -339,6 +339,9 @@
             this.tbPrice.Name = "tbPrice";
             this.tbPrice.Size = new System.Drawing.Size(100, 20);
             this.tbPrice.TabIndex = 5;
+            this.tbPrice.MouseClick += new System.Windows.Forms.MouseEventHandler(this.tbPrice_MouseClick);
+            this.tbPrice.TextChanged += new System.EventHandler(this.tbPrice_TextChanged);
+            this.tbPrice.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbPrice_KeyPress);
             // 
             // BuySell
             // 
