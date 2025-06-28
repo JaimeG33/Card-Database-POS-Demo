@@ -34,8 +34,8 @@ namespace Demo_Application_1
 
         private void btnBuySell_Click(object sender, EventArgs e)
         {
-            //Move to next form
-            Form buySellForm = new BuySell(connString);//pass the connection string
+            //Open BuySell Tab
+            Form buySellForm = new BuySell(connString, this);//pass the connection string and the HomePage reference
             buySellForm.Show();//oppen the seller form
             this.Hide();//hide this form
         }
@@ -110,6 +110,15 @@ namespace Demo_Application_1
             {
                 MessageBox.Show("Cancelled");
             }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            //Open History tab
+            Form history = new History(connString, this);
+            history.Show();
+            this.Hide();
+
         }
     }
 }

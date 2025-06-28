@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Demo_Application_1.Helpers;
 using HtmlAgilityPack; //the NuGet package downloaded to scrape websites
 using OpenQA.Selenium;//The Selenium packages are nessisary to access tcgplayer data without an api
 using OpenQA.Selenium.Chrome;
@@ -34,11 +35,15 @@ namespace Demo_Application_1
         public double selectedMktPrice;
         public bool selectedPriceUp2Date = true;
 
-        //public string imgURL = "";
-        public BuySell(string connectionString)
+        //Stuff for returning to HomePage
+        private HomePage _homePage;
+        private bool changingTabs = false;
+
+        public BuySell(string connectionString, HomePage homePage)//Constructor must be updated to accept HomePage reference
         {
             InitializeComponent();
             connString = connectionString;
+            _homePage = homePage;
         }
 
         private void BuySell_Load(object sender, EventArgs e)
@@ -56,6 +61,9 @@ namespace Demo_Application_1
 
             //Setup browser in background
             BackgroundBrowser();
+
+            //HomePage reset
+            changingTabs = false;
         }
         private void ImageResizing()
         {
@@ -92,8 +100,11 @@ namespace Demo_Application_1
                 driver.Quit();
                 driver.Dispose();
             }
-
-            Application.Exit();
+            if (changingTabs == false)
+            {
+                Application.Exit();
+            }
+            
         }
         private void LoadInventoryData(string searchText)
         {
@@ -380,6 +391,15 @@ namespace Demo_Application_1
             if (tbSearchBar.Text != null && tbSearchBar.TextLength > 1)
             {
                 LoadInventoryData(tbSearchBar.Text.Trim());
+            }
+        }
+
+        private void cbxProfile_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbxProfile.Text == "Return Home")
+            {
+                changingTabs = true;
+                NavigationHelper.ReturnToHome(this, _homePage, ref changingTabs);
             }
         }
     }

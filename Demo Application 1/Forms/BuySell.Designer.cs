@@ -68,10 +68,14 @@
             // cbxProfile
             // 
             this.cbxProfile.FormattingEnabled = true;
+            this.cbxProfile.Items.AddRange(new object[] {
+            "Current Tab",
+            "Return Home"});
             this.cbxProfile.Location = new System.Drawing.Point(12, 18);
             this.cbxProfile.Name = "cbxProfile";
             this.cbxProfile.Size = new System.Drawing.Size(144, 21);
             this.cbxProfile.TabIndex = 3;
+            this.cbxProfile.SelectedIndexChanged += new System.EventHandler(this.cbxProfile_SelectedIndexChanged);
             // 
             // panel1
             // 

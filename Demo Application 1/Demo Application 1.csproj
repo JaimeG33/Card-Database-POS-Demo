@@ -89,42 +89,43 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BuySell.cs">
+    <Compile Include="Forms\BuySell.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BuySell.Designer.cs">
+    <Compile Include="Forms\BuySell.Designer.cs">
       <DependentUpon>BuySell.cs</DependentUpon>
     </Compile>
-    <Compile Include="Form1.cs">
+    <Compile Include="Forms\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
+    <Compile Include="Forms\Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="History.cs">
+    <Compile Include="Forms\History.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="History.Designer.cs">
+    <Compile Include="Forms\History.Designer.cs">
       <DependentUpon>History.cs</DependentUpon>
     </Compile>
-    <Compile Include="HomePage.cs">
+    <Compile Include="Forms\HomePage.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="HomePage.Designer.cs">
+    <Compile Include="Forms\HomePage.Designer.cs">
       <DependentUpon>HomePage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="Helpers\NavigationHelper.cs" />
+    <Compile Include="Helpers\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="BuySell.resx">
+    <EmbeddedResource Include="Forms\BuySell.resx">
       <DependentUpon>BuySell.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form1.resx">
+    <EmbeddedResource Include="Forms\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="History.resx">
+    <EmbeddedResource Include="Forms\History.resx">
       <DependentUpon>History.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="HomePage.resx">
+    <EmbeddedResource Include="Forms\HomePage.resx">
       <DependentUpon>HomePage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">

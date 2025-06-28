@@ -113,6 +113,8 @@
             this.MinimumSize = new System.Drawing.Size(1000, 600);
             this.Name = "History";
             this.Text = "History";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.History_FormClosed);
+            this.Load += new System.EventHandler(this.History_Load);
             this.panelTitle.ResumeLayout(false);
             this.panelTitle.PerformLayout();
             this.ResumeLayout(false);
