@@ -89,5 +89,27 @@ namespace Demo_Application_1
                 MessageBox.Show("Cancelled");
             }
         }
+
+        private void btnResetIp_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show
+                ("This will delete the saved Ip Address and make you enter it again to log in",
+                    "Confirm Reset (This will exit the application)",
+                    MessageBoxButtons.OKCancel,
+                    MessageBoxIcon.Warning
+                );
+            if (result == DialogResult.OK)
+            {
+                Properties.Settings.Default.ServerIp = string.Empty;
+                Properties.Settings.Default.Save();
+
+                MessageBox.Show("IP address reset successfully. The application will now close.");
+                Application.Exit(); // Forces re-entry of IP on next start
+            }
+            else
+            {
+                MessageBox.Show("Cancelled");
+            }
+        }
     }
 }

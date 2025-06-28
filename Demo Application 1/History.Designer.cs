@@ -29,10 +29,10 @@
         private void InitializeComponent()
         {
             this.panelTitle = new System.Windows.Forms.Panel();
-            this.label2 = new System.Windows.Forms.Label();
-            this.btnSettings = new System.Windows.Forms.Button();
-            this.cbxProfile = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.cbxProfile = new System.Windows.Forms.ComboBox();
+            this.btnSettings = new System.Windows.Forms.Button();
             this.panelBackground = new System.Windows.Forms.Panel();
             this.panelTitle.SuspendLayout();
             this.SuspendLayout();
@@ -50,6 +50,15 @@
             this.panelTitle.Size = new System.Drawing.Size(984, 65);
             this.panelTitle.TabIndex = 6;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(430, 6);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(55, 13);
+            this.label1.TabIndex = 6;
+            this.label1.Text = "1000, 600";
+            // 
             // label2
             // 
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -63,6 +72,18 @@
             this.label2.Text = "Title";
             this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
+            // cbxProfile
+            // 
+            this.cbxProfile.FormattingEnabled = true;
+            this.cbxProfile.Items.AddRange(new object[] {
+            "Current Page",
+            "Return Home"});
+            this.cbxProfile.Location = new System.Drawing.Point(12, 12);
+            this.cbxProfile.Name = "cbxProfile";
+            this.cbxProfile.Size = new System.Drawing.Size(144, 21);
+            this.cbxProfile.TabIndex = 5;
+            this.cbxProfile.SelectedIndexChanged += new System.EventHandler(this.cbxProfile_SelectedIndexChanged);
+            // 
             // btnSettings
             // 
             this.btnSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -71,23 +92,6 @@
             this.btnSettings.Size = new System.Drawing.Size(44, 41);
             this.btnSettings.TabIndex = 0;
             this.btnSettings.UseVisualStyleBackColor = true;
-            // 
-            // cbxProfile
-            // 
-            this.cbxProfile.FormattingEnabled = true;
-            this.cbxProfile.Location = new System.Drawing.Point(12, 12);
-            this.cbxProfile.Name = "cbxProfile";
-            this.cbxProfile.Size = new System.Drawing.Size(144, 21);
-            this.cbxProfile.TabIndex = 5;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(430, 6);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(55, 13);
-            this.label1.TabIndex = 6;
-            this.label1.Text = "1000, 600";
             // 
             // panelBackground
             // 

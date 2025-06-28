@@ -16,5 +16,14 @@ namespace Demo_Application_1
         {
             InitializeComponent();
         }
+
+        private void cbxProfile_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbxProfile.Text == "Return Home")
+            {
+                
+            }
+        }
+
     }
 }

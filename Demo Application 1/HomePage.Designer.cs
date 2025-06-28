@@ -50,6 +50,7 @@
             this.button7 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
+            this.btnResetIp = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -250,6 +251,7 @@
             // panel5
             // 
             this.panel5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.panel5.Controls.Add(this.btnResetIp);
             this.panel5.Controls.Add(this.btnResetDate);
             this.panel5.Controls.Add(this.button7);
             this.panel5.Controls.Add(this.button6);
@@ -263,12 +265,14 @@
             // btnResetDate
             // 
             this.btnResetDate.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnResetDate.BackColor = System.Drawing.Color.Silver;
+            this.btnResetDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnResetDate.Location = new System.Drawing.Point(353, 66);
             this.btnResetDate.Name = "btnResetDate";
             this.btnResetDate.Size = new System.Drawing.Size(132, 31);
             this.btnResetDate.TabIndex = 7;
             this.btnResetDate.Text = "Reset Market Prices";
-            this.btnResetDate.UseVisualStyleBackColor = true;
+            this.btnResetDate.UseVisualStyleBackColor = false;
             this.btnResetDate.Click += new System.EventHandler(this.btnResetDate_Click);
             // 
             // button7
@@ -299,6 +303,19 @@
             this.label4.Size = new System.Drawing.Size(68, 13);
             this.label4.TabIndex = 2;
             this.label4.Text = "Admin Tasks";
+            // 
+            // btnResetIp
+            // 
+            this.btnResetIp.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnResetIp.BackColor = System.Drawing.Color.Silver;
+            this.btnResetIp.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnResetIp.Location = new System.Drawing.Point(491, 66);
+            this.btnResetIp.Name = "btnResetIp";
+            this.btnResetIp.Size = new System.Drawing.Size(132, 31);
+            this.btnResetIp.TabIndex = 8;
+            this.btnResetIp.Text = "Reset IP Address";
+            this.btnResetIp.UseVisualStyleBackColor = false;
+            this.btnResetIp.Click += new System.EventHandler(this.btnResetIp_Click);
             // 
             // HomePage
             // 
@@ -353,5 +370,6 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Panel panel6;
         private System.Windows.Forms.Button btnResetDate;
+        private System.Windows.Forms.Button btnResetIp;
     }
 }

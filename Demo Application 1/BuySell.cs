@@ -377,7 +377,7 @@ namespace Demo_Application_1
                 panel4.BackColor = Color.Red;
             }
 
-            if (tbSearchBar.Text != null)
+            if (tbSearchBar.Text != null && tbSearchBar.TextLength > 1)
             {
                 LoadInventoryData(tbSearchBar.Text.Trim());
             }

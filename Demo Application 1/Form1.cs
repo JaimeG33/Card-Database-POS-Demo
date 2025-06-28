@@ -21,7 +21,23 @@ namespace Demo_Application_1
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            //If IP is not saved yet (usually the first time the app loads) ask user for it
+            if (string.IsNullOrEmpty(Properties.Settings.Default.ServerIp) )
+            {
+                string input = Microsoft.VisualBasic.Interaction.InputBox( //must add Microsoft.VisualBasic in the References for this to work
+                    "Enter the SQL Server IP address:", "Server IP Required", "127.0.0.1");
 
+                if (!string.IsNullOrEmpty(input) )
+                {
+                    Properties.Settings.Default.ServerIp = input;
+                    Properties.Settings.Default.Save();
+                }
+                else
+                {
+                    MessageBox.Show("IP address is required. Exiting.");
+                    Application.Exit();
+                }
+            }
         }
 
 
@@ -36,7 +52,9 @@ namespace Demo_Application_1
             public bool TryConnect(string username, string password, out string message)
             {
                 // Builds connection string using the user's input
-                connectionString = string.Format("Server=192.168.1.153\\SQLEXPRESS;Database=Revised Demo Database CAv2;User Id={0};Password={1};", username, password);
+                //Current ipAddress = 192.168.1.153
+                string serverIP = Properties.Settings.Default.ServerIp;
+                connectionString = string.Format("Server={2}\\SQLEXPRESS;Database=Revised Demo Database CAv2;User Id={0};Password={1};", username, password, serverIP);
                 //Connection String Explained
                 //Server = MainComputer (//usingSQLExpress)
                 //Database = whichever one you are connected to (Revised Demo Database CAv2)
