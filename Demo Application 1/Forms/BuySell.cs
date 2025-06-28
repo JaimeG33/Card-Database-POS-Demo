@@ -28,12 +28,13 @@ namespace Demo_Application_1
         //the Connection string from the login
         private string connString;
         //The stored info for later use
-        public int selectedCardGame;
-        public int selectedConditionId;
-        public int selectedCardId;
-        public string selectedPriceURL = "";
-        public double selectedMktPrice;
-        public bool selectedPriceUp2Date = true;
+        private int selectedCardGame;
+        private int selectedConditionId;
+        private int selectedCardId;
+        private string selectedPriceURL = "";
+        private double selectedMktPrice;
+        private bool selectedPriceUp2Date = true;
+        private double transactionPrice;
 
         //Stuff for returning to HomePage
         private HomePage _homePage;
@@ -85,8 +86,11 @@ namespace Demo_Application_1
                 // Position lblMarketPrice below lblInStock
                 lblMktPrice.Location = new Point(lblInStock.Left, lblInStock.Bottom + 10);
 
+                //Position tbPrice text box
+                tbPrice.Location = new Point(lblMktPrice.Left, lblMktPrice.Bottom + 10);
+
                 //Position add2cart button
-                btnAddCt.Location = new Point(lblMktPrice.Left, lblMktPrice.Bottom + 10);
+                btnAddCt.Location = new Point(tbPrice.Left, tbPrice.Bottom + 10);
                 //Sale Info label stays where its at
             }
         }
@@ -206,6 +210,9 @@ namespace Demo_Application_1
         {
             if (e.RowIndex >= 0) // Make sure it's not a header click?
             {
+                // Get the column that was clicked
+                string clickedColumn = dataGridView1.Columns[e.ColumnIndex].Name;
+                // Select the row that was clicked
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
                 //gets the selected image url
                 string imageURL = row.Cells["imageURL"].Value?.ToString();
@@ -213,11 +220,16 @@ namespace Demo_Application_1
                 //gets the selected values (used in pricecheck function)
                 selectedPriceURL = row.Cells["mktPriceURL"].Value?.ToString();
                 selectedPriceUp2Date = Convert.ToBoolean(row.Cells["priceUp2Date"].Value);
-                //Format market price onto the label properly
+                //Format market price onto the label properly and record value
                 string mktPriceRaw = row.Cells["mktPrice"].Value?.ToString();
-                if (double.TryParse(mktPriceRaw, out double mktPriceParsed))
+                
+                if (double.TryParse(mktPriceRaw, System.Globalization.NumberStyles.Currency,
+                System.Globalization.CultureInfo.CreateSpecificCulture("en-US"), out double mktPriceParsed))
                 {
+                    selectedMktPrice = mktPriceParsed;
+                    TransactionPriceLogic();
                     lblMktPrice.Text = $"Market Price: {mktPriceParsed.ToString("C2", System.Globalization.CultureInfo.CreateSpecificCulture("en-US"))}";
+                    tbPrice.Text = transactionPrice.ToString("C2");
                 }
                 else
                 {
@@ -256,11 +268,24 @@ namespace Demo_Application_1
                         MessageBox.Show("Unable to load image");
                     }
                 }
+                if (clickedColumn == "priceUp2Date")
+                {
+                    //check to see if the selected row is up to date
+                    bool isUp2Date = Convert.ToBoolean(dataGridView1.Rows[e.RowIndex].Cells["priceUp2Date"].Value);
+                    if (isUp2Date == false)
+                    {
+                        UpdatePrice();
+                        //lblMktPrice.BackColor = Color.LightYellow;
+                        //await Task.Delay(1500);
+                        //lblMktPrice.BackColor = SystemColors.AppWorkspace;
+                    }
+                }
             }
             else
             {
                 imgCardUrl.Image = null;
             }
+
         }
 
         private void PriceCheck ()
@@ -279,7 +304,8 @@ namespace Demo_Application_1
                 string rawPrice = priceElement.Text.Trim().Replace("$", "").Replace(",", "");
                 selectedMktPrice = double.Parse(rawPrice, System.Globalization.CultureInfo.InvariantCulture);
                 lblMktPrice.Text = "Market Price: " + selectedMktPrice.ToString("C2", System.Globalization.CultureInfo.CreateSpecificCulture("en-US"));
-
+                TransactionPriceLogic();
+                tbPrice.Text = transactionPrice.ToString("C2");
 
                 selectedPriceUp2Date = true;
                 lblMktPrice.Font = new Font(lblMktPrice.Font, FontStyle.Regular);
@@ -352,12 +378,17 @@ namespace Demo_Application_1
 
         private void btnAddCt_Click(object sender, EventArgs e)
         {
+            UpdatePrice();
+        }
+        private void UpdatePrice()
+        {
             if (selectedPriceUp2Date == false)
             {
+                lblMktPrice.BackColor = Color.LightYellow; // change the color so the user knows the program is loading and not frozen
                 //remember the selected position
                 int currentRowIndex = dataGridView1.CurrentRow?.Index ?? -1;
                 //updates the actual database, but doesnt imediately show on the DataGridView
-                PriceCheck(); 
+                PriceCheck();
                 // Refresh table
                 LoadInventoryData(tbSearchBar.Text.Trim());
                 // Restore position
@@ -367,9 +398,50 @@ namespace Demo_Application_1
                     dataGridView1.Rows[currentRowIndex].Selected = true;
                     dataGridView1.FirstDisplayedScrollingRowIndex = currentRowIndex;
                 }
+                lblMktPrice.BackColor = SystemColors.AppWorkspace; // return the color back to normal
             }
         }
+        private void TransactionPriceLogic()
+        {
+            double mathPrice = selectedMktPrice;
+            
+            if (mathPrice < 0.80)
+            {
+                // Round to nearest quarter (0.25)
+                transactionPrice = Math.Round(mathPrice * 4, MidpointRounding.AwayFromZero) / 4;
+            }
+            else if (mathPrice >= 0.80 && mathPrice < 5)
+            {
+                // Ceiling = round up, (this rounds up to the nearest 0.50)
+                transactionPrice = Math.Ceiling(mathPrice * 2) / 2;
+            }
+            else if (mathPrice >= 5 && mathPrice < 18)
+            {
+                // (round up to the nearest dollar)
+                transactionPrice = Math.Ceiling(mathPrice);
+            }
+            else if (mathPrice >= 18 && mathPrice < 20)
+            {
+                transactionPrice = 20;
+            }
+            else if (mathPrice >= 20 && mathPrice < 35)
+            {
+                //just regular rounding
+                transactionPrice = Math.Round(mathPrice);
+            }
+            else if (mathPrice >= 35 )
+            {
+                // round to the nearest whole 5
+                transactionPrice = Math.Round(mathPrice / 5) * 5;
+            }
+            else
+            {
+                //round up to the next whole number
+                transactionPrice = Math.Ceiling(mathPrice);
+            }
 
+            
+        }
         private void cbCardGame_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbCardGame.Text == "Yugioh")

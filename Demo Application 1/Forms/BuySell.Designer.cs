@@ -51,6 +51,7 @@
             this.panel5 = new System.Windows.Forms.Panel();
             this.cbCardGame = new System.Windows.Forms.ComboBox();
             this.tbSearchBar = new System.Windows.Forms.TextBox();
+            this.tbPrice = new System.Windows.Forms.TextBox();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -159,6 +160,7 @@
             // 
             // panel6
             // 
+            this.panel6.Controls.Add(this.tbPrice);
             this.panel6.Controls.Add(this.btnAddCt);
             this.panel6.Controls.Add(this.lblSaleInfo);
             this.panel6.Controls.Add(this.lblMktPrice);
@@ -173,7 +175,7 @@
             // btnAddCt
             // 
             this.btnAddCt.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.btnAddCt.Location = new System.Drawing.Point(164, 92);
+            this.btnAddCt.Location = new System.Drawing.Point(164, 101);
             this.btnAddCt.Name = "btnAddCt";
             this.btnAddCt.Size = new System.Drawing.Size(89, 23);
             this.btnAddCt.TabIndex = 4;
@@ -330,6 +332,14 @@
             this.tbSearchBar.TextChanged += new System.EventHandler(this.tbSearchBar_TextChanged);
             this.tbSearchBar.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbSearchBar_KeyDown);
             // 
+            // tbPrice
+            // 
+            this.tbPrice.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.tbPrice.Location = new System.Drawing.Point(164, 75);
+            this.tbPrice.Name = "tbPrice";
+            this.tbPrice.Size = new System.Drawing.Size(100, 20);
+            this.tbPrice.TabIndex = 5;
+            // 
             // BuySell
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -385,5 +395,6 @@
         private System.Windows.Forms.Label lblSaleInfo;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Button btnAddCt;
+        private System.Windows.Forms.TextBox tbPrice;
     }
 }
