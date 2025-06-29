@@ -45,14 +45,15 @@
             this.imgCardUrl = new System.Windows.Forms.PictureBox();
             this.lblInStock = new System.Windows.Forms.Label();
             this.panel7 = new System.Windows.Forms.Panel();
+            this.panelTransSales = new System.Windows.Forms.Panel();
+            this.dataGridTransactionSystem = new System.Windows.Forms.DataGridView();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.panel5 = new System.Windows.Forms.Panel();
             this.cbCardGame = new System.Windows.Forms.ComboBox();
             this.tbSearchBar = new System.Windows.Forms.TextBox();
-            this.panelTransSales = new System.Windows.Forms.Panel();
-            this.dataGridTransactionSystem = new System.Windows.Forms.DataGridView();
+            this.btnFinalizeSale = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -61,12 +62,12 @@
             this.tLP_img.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imgCardUrl)).BeginInit();
             this.panel7.SuspendLayout();
+            this.panelTransSales.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridTransactionSystem)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel5.SuspendLayout();
-            this.panelTransSales.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridTransactionSystem)).BeginInit();
             this.SuspendLayout();
             // 
             // cbxProfile
@@ -163,6 +164,7 @@
             // 
             // panel6
             // 
+            this.panel6.Controls.Add(this.btnFinalizeSale);
             this.panel6.Controls.Add(this.tbPrice);
             this.panel6.Controls.Add(this.btnAddCt);
             this.panel6.Controls.Add(this.lblSaleInfo);
@@ -265,6 +267,31 @@
             this.panel7.Size = new System.Drawing.Size(346, 182);
             this.panel7.TabIndex = 1;
             // 
+            // panelTransSales
+            // 
+            this.panelTransSales.BackColor = System.Drawing.SystemColors.Info;
+            this.panelTransSales.Controls.Add(this.dataGridTransactionSystem);
+            this.panelTransSales.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelTransSales.Location = new System.Drawing.Point(0, 0);
+            this.panelTransSales.Name = "panelTransSales";
+            this.panelTransSales.Padding = new System.Windows.Forms.Padding(10);
+            this.panelTransSales.Size = new System.Drawing.Size(346, 182);
+            this.panelTransSales.TabIndex = 0;
+            // 
+            // dataGridTransactionSystem
+            // 
+            this.dataGridTransactionSystem.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridTransactionSystem.BackgroundColor = System.Drawing.Color.White;
+            this.dataGridTransactionSystem.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridTransactionSystem.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridTransactionSystem.Location = new System.Drawing.Point(10, 10);
+            this.dataGridTransactionSystem.Name = "dataGridTransactionSystem";
+            this.dataGridTransactionSystem.Size = new System.Drawing.Size(326, 162);
+            this.dataGridTransactionSystem.TabIndex = 0;
+            this.dataGridTransactionSystem.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridTransactionSystem_CellClick);
+            this.dataGridTransactionSystem.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridTransactionSystem_CellContentClick);
+            this.dataGridTransactionSystem.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridTransactionSystem_CellEndEdit);
+            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 1;
@@ -337,26 +364,16 @@
             this.tbSearchBar.TextChanged += new System.EventHandler(this.tbSearchBar_TextChanged);
             this.tbSearchBar.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbSearchBar_KeyDown);
             // 
-            // panelTransSales
+            // btnFinalizeSale
             // 
-            this.panelTransSales.BackColor = System.Drawing.SystemColors.Info;
-            this.panelTransSales.Controls.Add(this.dataGridTransactionSystem);
-            this.panelTransSales.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelTransSales.Location = new System.Drawing.Point(0, 0);
-            this.panelTransSales.Name = "panelTransSales";
-            this.panelTransSales.Padding = new System.Windows.Forms.Padding(10);
-            this.panelTransSales.Size = new System.Drawing.Size(346, 182);
-            this.panelTransSales.TabIndex = 0;
-            // 
-            // dataGridTransactionSystem
-            // 
-            this.dataGridTransactionSystem.BackgroundColor = System.Drawing.Color.White;
-            this.dataGridTransactionSystem.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridTransactionSystem.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridTransactionSystem.Location = new System.Drawing.Point(10, 10);
-            this.dataGridTransactionSystem.Name = "dataGridTransactionSystem";
-            this.dataGridTransactionSystem.Size = new System.Drawing.Size(326, 162);
-            this.dataGridTransactionSystem.TabIndex = 0;
+            this.btnFinalizeSale.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.btnFinalizeSale.Location = new System.Drawing.Point(236, 158);
+            this.btnFinalizeSale.Name = "btnFinalizeSale";
+            this.btnFinalizeSale.Size = new System.Drawing.Size(100, 23);
+            this.btnFinalizeSale.TabIndex = 6;
+            this.btnFinalizeSale.Text = "Finalize Sale";
+            this.btnFinalizeSale.UseVisualStyleBackColor = true;
+            this.btnFinalizeSale.Click += new System.EventHandler(this.btnFinalizeSale_Click);
             // 
             // BuySell
             // 
@@ -380,13 +397,13 @@
             this.tLP_img.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.imgCardUrl)).EndInit();
             this.panel7.ResumeLayout(false);
+            this.panelTransSales.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridTransactionSystem)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
-            this.panelTransSales.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridTransactionSystem)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -417,5 +434,6 @@
         private System.Windows.Forms.TextBox tbPrice;
         private System.Windows.Forms.Panel panelTransSales;
         private System.Windows.Forms.DataGridView dataGridTransactionSystem;
+        private System.Windows.Forms.Button btnFinalizeSale;
     }
 }

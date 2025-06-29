@@ -54,12 +54,16 @@ namespace Demo_Application_1
 
         private void BuySell_Load(object sender, EventArgs e)
         {
+            //Setup browser in background
+            BackgroundBrowser();
+
             //setup for sale / transaction system
             CheckSeller();
-            if (string.IsNullOrEmpty(currentSaleStatus) )
+            if (string.IsNullOrEmpty(currentSaleStatus) && !(workingOnOrder == true))
             {
-                GenerateSale();
+                GenerateSale();// updates the database and creates a row for the Sale table
             }
+            btnFinalizeSale.Visible = false;
 
             //Form Size
             this.WindowState = FormWindowState.Maximized;
@@ -71,10 +75,9 @@ namespace Demo_Application_1
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AllowUserToDeleteRows = false;
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-
-            //Setup browser in background
-            BackgroundBrowser();
-
+            dataGridTransactionSystem.ReadOnly = true;
+            dataGridTransactionSystem.AllowUserToAddRows = false;
+            
             //HomePage reset
             changingTabs = false;
         }
@@ -289,9 +292,6 @@ namespace Demo_Application_1
                     if (isUp2Date == false)
                     {
                         UpdatePrice();
-                        //lblMktPrice.BackColor = Color.LightYellow;
-                        //await Task.Delay(1500);
-                        //lblMktPrice.BackColor = SystemColors.AppWorkspace;
                     }
                 }
             }
@@ -392,10 +392,9 @@ namespace Demo_Application_1
 
         private void btnAddCt_Click(object sender, EventArgs e)
         {
-            UpdatePrice();
+            UpdatePrice(); //First update the price if needed to make sure its accurate
 
             // 1. Collect input from your form (dropdowns, textboxes, etc.)
-            // For this example, we’ll hardcode values to test
             TransactionLineItem newItem = new TransactionLineItem
             {
                 CardGameId = selectedCardGame,
@@ -413,7 +412,13 @@ namespace Demo_Application_1
             cartItems.Add(newItem);
 
             // 3. Refresh the DataGridView
+            if(currentSaleStatus == "pre-prep")
+            {
+                currentSaleStatus = "taking order";
+            }
+            btnFinalizeSale.Visible = true;
             SaleTransactionLineSystem();
+            dataGridTransactionSystem.ReadOnly = true;
         }
         private void UpdatePrice()
         {
@@ -557,43 +562,88 @@ namespace Demo_Application_1
         //Stuff for the Sale / Transaction system
         private int currentSaleId;
         private string currentSaleStatus;
+        private bool workingOnOrder;
         private void CheckSeller()
         {
             int saleId = 1; //Default if no sales today
+            int employeeId = 10; //Fix later, just keep 10 for now
             //Get current date / time
             DateTime currentDate = DateTime.Now.Date;
 
-            //Find which saleId the user is currently on:
-            string query = @"
-                            SELECT MAX(saleId)
-                            FROM dbo.Sale
-                            WHERE CAST(saleDate AS DATE) = @TodayDate;
-                            ";
+            //Queries to be used later
+            string queryFindLatestSaleId = "SELECT ISNULL(MAX(saleId), 0) FROM dbo.Sale;";
+
+            string queryCheckLastSale = @" 
+        SELECT TOP 1 saleId, orderStatus
+        FROM dbo.Sale
+        WHERE employeeId = @employeeId
+        ORDER BY saleDate DESC;
+                                        ";
 
             using (SqlConnection connection = new SqlConnection(connString))
-            using (SqlCommand cmd = new SqlCommand(query, connection))
             {
-                //List all sales made today
-                cmd.Parameters.AddWithValue("@TodayDate", currentDate);
                 connection.Open();
 
-                object result = cmd.ExecuteScalar();
-                if (result != DBNull.Value)
+                // find the latest SaleId
+                using(SqlCommand cmd1 = new SqlCommand(queryFindLatestSaleId, connection))
                 {
-                    saleId = Convert.ToInt32(result) + 1;
+                    object result = cmd1.ExecuteScalar();
+                    if (result != DBNull.Value)
+                    {
+                        saleId = Convert.ToInt32(result);
+                    }
                 }
-                currentSaleId = saleId;
-            }          
+
+                // then check if the user has any unfinished orders
+                using(SqlCommand cmd2 = new SqlCommand(queryCheckLastSale, connection))
+                {
+                    cmd2.Parameters.AddWithValue("@employeeId", employeeId);
+
+                    using (SqlDataReader reader = cmd2.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string lastStatus = reader["orderStatus"] != DBNull.Value
+                                ? reader["orderStatus"].ToString() : null;
+
+                            // If last sale is null or marked "finished and paid", treat it as done
+                            if (string.IsNullOrEmpty(lastStatus) || lastStatus == "finished and paid")
+                            {
+                                currentSaleId = saleId + 1;
+                                currentSaleStatus = null;
+                                workingOnOrder = false;
+                            }
+                            else
+                            {
+                                // Still working on previous sale
+                                currentSaleId = Convert.ToInt32(reader["saleId"]);
+                                currentSaleStatus = lastStatus;
+                                workingOnOrder = true;
+                            }
+
+                            return;
+                        }
+                    }
+                }
+                // 3. If employee has never made a sale, start new one
+                currentSaleId = saleId + 1;
+                currentSaleStatus = null;
+                workingOnOrder = false;
+            }
+         
         }
         private void GenerateSale()
         {
             DateTime currentDateTime = DateTime.Now;
             int employeeIdColumn = 10; //Make a funciton to get this later
             int registerColumn = 1; //Make a funciton to get this later
-            currentSaleStatus = "pre-prep";
             int saleIdColumn = currentSaleId;
 
-            string query = @"
+            if (!workingOnOrder == true)
+            {
+                currentSaleStatus = "pre-prep";
+
+                string query = @"
     INSERT INTO dbo.Sale (
         saleDate,
         saleId,
@@ -609,21 +659,28 @@ namespace Demo_Application_1
         @register
     );
 ";
-            using (SqlConnection connection = new SqlConnection(connString))
-            using (SqlCommand cmd = new SqlCommand(query, connection))
-            {
-                cmd.Parameters.AddWithValue("@saleDate", currentDateTime);
-                cmd.Parameters.AddWithValue("@saleId", saleIdColumn);
-                cmd.Parameters.AddWithValue("@employeeId", employeeIdColumn);
-                cmd.Parameters.AddWithValue("@orderStatus", currentSaleStatus);
-                cmd.Parameters.AddWithValue("@register", registerColumn);
+                using (SqlConnection connection = new SqlConnection(connString))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@saleDate", currentDateTime);
+                    cmd.Parameters.AddWithValue("@saleId", saleIdColumn);
+                    cmd.Parameters.AddWithValue("@employeeId", employeeIdColumn);
+                    cmd.Parameters.AddWithValue("@orderStatus", currentSaleStatus);
+                    cmd.Parameters.AddWithValue("@register", registerColumn);
 
-                connection.Open();
-                cmd.ExecuteNonQuery();
+                    connection.Open();
+                    cmd.ExecuteNonQuery();
+                }
+                workingOnOrder = true;
             }
+            else if (workingOnOrder == true)
+            {
+
+            }
+            
         }
-        private List<TransactionLineItem> cartItems = new List<TransactionLineItem>();
-        public class TransactionLineItem
+        private List<TransactionLineItem> cartItems = new List<TransactionLineItem>(); //The list representing the selected items added to cart 
+        public class TransactionLineItem //(TransactioLine)
         {
             public int CardGameId { get; set; }
             public int CardId { get; set; }
@@ -650,25 +707,153 @@ namespace Demo_Application_1
             dt.Columns.Add("Market Price");
             dt.Columns.Add("Total");
 
-            dt.Rows.Add("Sale Info", $"Sale ID: {currentSaleId}", $"Employee ID: {employeeIdColumn}", "", "", "", $"Register: {registerColumn}");
+            //This is a Sale Info type of row (at the top of the grid)
+            dt.Rows.Add("Sale Info", $"Sale ID: {currentSaleId}", $"Employee ID: {employeeIdColumn}", "", "",
+                $"Status: {currentSaleStatus ?? "N/A"}", $"Register: {registerColumn}");
 
             foreach (var item in cartItems) // cartItems is List<TransactionLineItem>
             {
                 decimal total = item.AgreedPrice * item.AmtTraded;
-                dt.Rows.Add("Item", item.CardName, item.SetId, item.AmtTraded, item.AgreedPrice, item.TimeMktPrice, total);
+                //This is an Item type of row (TransactionLine)
+                dt.Rows.Add("Item", item.CardName, item.SetId, item.AmtTraded, item.AgreedPrice.ToString("C2"),
+                    item.TimeMktPrice.ToString("C2"), total.ToString("C2"));
             }
-
+            //Stuff at the bottom of the row
             decimal grandTotal = cartItems.Sum(i => i.AgreedPrice * i.AmtTraded);
-            dt.Rows.Add("TOTAL", "", "", "", "", "", grandTotal);
+            dt.Rows.Add("TOTAL", "", "", "", "", "", grandTotal.ToString("C2"));
 
             dataGridTransactionSystem.DataSource = dt;
 
-            dataGridTransactionSystem.ReadOnly = true;
+            //Only allow the user to edit the Agreed Price column
+            for (int i = 0; i < dataGridTransactionSystem.Rows.Count; i++)
+            {
+                var row = dataGridTransactionSystem.Rows[i];
+                var cellValue = row.Cells[0].Value;
+                if (cellValue != null && cellValue.ToString() == "Item")
+                {
+                    row.Cells["Agreed Price"].ReadOnly = false;
+                }
+                else
+                {
+                    row.ReadOnly = true;
+                }
+            }
+
+
+            //change colors of certain rows to make it easier to read
             dataGridTransactionSystem.Rows[0].DefaultCellStyle.BackColor = Color.LightBlue; // Sale Info
-            dataGridTransactionSystem.Rows[dataGridTransactionSystem.Rows.Count - 1].DefaultCellStyle.BackColor = Color.LightGray; // Total
+            dataGridTransactionSystem.Rows[dataGridTransactionSystem.Rows.Count - 1].DefaultCellStyle.
+                BackColor = Color.LightGray; // Total
+            //also prevent user from adding new rows manually (might allow later, idk yet)
+            dataGridTransactionSystem.AllowUserToAddRows = false;
 
         }
+        
+        private void dataGridTransactionSystem_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            var row = dataGridTransactionSystem.Rows[e.RowIndex];
+            if (row.Cells[0].Value.ToString() != "Item") return; // Ignore non-item types of rows
 
+            // Parse the new agreed price
+            if (decimal.TryParse(row.Cells["Agreed Price"].Value.ToString(), out decimal newPrice))
+            {
+                string cardName = row.Cells["Card Name"].Value.ToString();
+                int setId = Convert.ToInt32( row.Cells["Set ID"].Value);
+
+                var item = cartItems.FirstOrDefault(i => i.CardName == cardName && i.SetId == setId);
+                if (item != null)
+                {
+                    item.AgreedPrice = newPrice;
+
+                    // Update Total column 
+                    decimal total = item.AgreedPrice * item.AmtTraded;
+                    row.Cells["Total"].Value = total.ToString("C2");
+
+                    // Update grand total
+                    decimal grandTotal = cartItems.Sum(i => i.AgreedPrice * i.AmtTraded);
+                    var totalRow = dataGridTransactionSystem.Rows[dataGridTransactionSystem.Rows.Count - 1];
+                    totalRow.Cells["Total"].Value = grandTotal.ToString("C2");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please enter a valid decimal price.");
+                row.Cells["Agreed Price"].Value = ""; // Clear invalid input
+            }
+        }
+
+        private void dataGridTransactionSystem_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            
+        }
+
+        private void dataGridTransactionSystem_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return; // Ignore header clicks
+            
+            var clickedRow = dataGridTransactionSystem.Rows [e.RowIndex];
+            var clickedColumn = dataGridTransactionSystem.Columns [e.ColumnIndex];
+
+            var clickedCell = dataGridTransactionSystem.Rows[e.RowIndex].Cells[e.ColumnIndex];
+            string lineType = clickedRow.Cells["Type"].Value?.ToString();
+            //only allow certain rows / columns to be edited
+            if (lineType == "Item" && (clickedColumn.Name == "Agreed Price" || clickedColumn.Name == "Qty") )
+            {
+                dataGridTransactionSystem.ReadOnly = false;
+                clickedRow.Cells[clickedColumn.Name].ReadOnly = false;
+                dataGridTransactionSystem.BeginEdit(true);
+            }
+            else if (lineType == "TOTAL" && clickedColumn.Name == "Total")
+            {
+                dataGridTransactionSystem.ReadOnly = false;
+                clickedRow.Cells["Total"].ReadOnly = false;
+                dataGridTransactionSystem.BeginEdit(true);
+            }
+            else if(clickedCell is DataGridViewButtonCell && clickedCell.Value?.ToString() == "Finalize Sale")
+            {
+                
+            }
+            else
+            {
+                dataGridTransactionSystem.ReadOnly = true;
+            }
+
+        }
+        private void PlaceTheDamButton() //I cant believe this is the fucking thing that I gave up on first because it was too complicated
+        {//implement later, just settle for crappy button placement for now
+            int rowIndex = dataGridTransactionSystem.Rows.Count - 1; //Find the bottom row
+            int columnIndex = dataGridTransactionSystem.Columns.Count - 3;//Find the column (3rd from the right)
+
+            if (rowIndex < 0 || columnIndex < 0)
+            {
+                return; //ignore title rows / columns
+            }
+
+            // Find the cell's rectangle
+            Rectangle cellRect = dataGridTransactionSystem.GetCellDisplayRectangle(columnIndex, rowIndex, true);
+            
+            // Convert to screen coordinates, then to form
+            Point cellLocation = dataGridTransactionSystem.PointToScreen(cellRect.Location);
+            Point buttonLocation = this.PointToClient(cellLocation);
+
+            // Move / size the button
+            btnFinalizeSale.SetBounds(
+                buttonLocation.X,
+                buttonLocation.Y,
+                cellRect.Width,
+                cellRect.Height);
+
+            btnFinalizeSale.Visible = true;
+        }
+
+        private void TransactionLineLogic()
+        {
+
+        }
+        private void btnFinalizeSale_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
 
