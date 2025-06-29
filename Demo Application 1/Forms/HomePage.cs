@@ -14,7 +14,7 @@ namespace Demo_Application_1
     public partial class HomePage : Form
     {
         private string connString;
-
+        
         //public HomePage()  moddified to take the connection string from the login page
         public HomePage(string connectionString)
         {

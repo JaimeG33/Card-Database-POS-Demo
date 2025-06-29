@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Demo_Application_1.Helpers;
 using HtmlAgilityPack; //the NuGet package downloaded to scrape websites
+using Microsoft.Win32;
 using OpenQA.Selenium;//The Selenium packages are nessisary to access tcgplayer data without an api
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -31,10 +32,14 @@ namespace Demo_Application_1
         private int selectedCardGame;
         private int selectedConditionId;
         private int selectedCardId;
+        private int selectedSetId;
         private string selectedPriceURL = "";
+        private string selectedCardName = "";
         private double selectedMktPrice;
         private bool selectedPriceUp2Date = true;
         private double transactionPrice;
+        
+        
 
         //Stuff for returning to HomePage
         private HomePage _homePage;
@@ -49,6 +54,13 @@ namespace Demo_Application_1
 
         private void BuySell_Load(object sender, EventArgs e)
         {
+            //setup for sale / transaction system
+            CheckSeller();
+            if (string.IsNullOrEmpty(currentSaleStatus) )
+            {
+                GenerateSale();
+            }
+
             //Form Size
             this.WindowState = FormWindowState.Maximized;
             ImageResizing(); // run ImageResizing Logic
@@ -243,6 +255,8 @@ namespace Demo_Application_1
 
                 selectedCardId = Convert.ToInt32(row.Cells["cardId"].Value);
                 selectedConditionId = Convert.ToInt32(row.Cells["conditionId"].Value?.ToString());
+                selectedSetId = Convert.ToInt32(row.Cells["setId"].Value?.ToString());
+                selectedCardName = row.Cells["cardName"].Value?.ToString();
 
                 //gets the selected amount in stock value
                 var value = row.Cells["amtInStock"].Value;
@@ -379,6 +393,27 @@ namespace Demo_Application_1
         private void btnAddCt_Click(object sender, EventArgs e)
         {
             UpdatePrice();
+
+            // 1. Collect input from your form (dropdowns, textboxes, etc.)
+            // For this example, we’ll hardcode values to test
+            TransactionLineItem newItem = new TransactionLineItem
+            {
+                CardGameId = selectedCardGame,
+                CardId = selectedCardId,
+                ConditionId = selectedConditionId,
+                CardName = selectedCardName,
+                SetId = selectedSetId,
+                TimeMktPrice = (decimal)selectedMktPrice, //convert to decimal for now
+                AgreedPrice = (decimal)transactionPrice, // same, should fix later
+                AmtTraded = 1, //add amount funtionality later
+                BuyOrSell = true // true = store is selling
+            };
+
+            // 2. Add to cart
+            cartItems.Add(newItem);
+
+            // 3. Refresh the DataGridView
+            SaleTransactionLineSystem();
         }
         private void UpdatePrice()
         {
@@ -452,16 +487,19 @@ namespace Demo_Application_1
             {
                 selectedCardGame = 1;
                 panel4.BackColor = Color.DarkOrange;
+                panelTransSales.BackColor = Color.DarkOrange;
             }
             if (cbCardGame.Text == "Magic")
             {
                 selectedCardGame = 2;
                 panel4.BackColor = Color.LightGray;
+                panelTransSales.BackColor = Color.LightGray;
             }
             if (cbCardGame.Text == "Pokemon")
             {
                 selectedCardGame = 3;
                 panel4.BackColor = Color.Red;
+                panelTransSales.BackColor = Color.Red;
             }
 
             if (tbSearchBar.Text != null && tbSearchBar.TextLength > 1)
@@ -469,7 +507,7 @@ namespace Demo_Application_1
                 LoadInventoryData(tbSearchBar.Text.Trim());
             }
         }
-
+        //Return to home screen button
         private void cbxProfile_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbxProfile.Text == "Return Home")
@@ -478,6 +516,7 @@ namespace Demo_Application_1
                 NavigationHelper.ReturnToHome(this, _homePage, ref changingTabs);
             }
         }
+        //Stuff for selecting the agreed apon price of the transaction
         private void tbPrice_MouseClick(object sender, MouseEventArgs e)
         {
             UpdatePrice();
@@ -515,7 +554,121 @@ namespace Demo_Application_1
             tbPrice.TextChanged += tbPrice_TextChanged;
         }
 
+        //Stuff for the Sale / Transaction system
+        private int currentSaleId;
+        private string currentSaleStatus;
+        private void CheckSeller()
+        {
+            int saleId = 1; //Default if no sales today
+            //Get current date / time
+            DateTime currentDate = DateTime.Now.Date;
+
+            //Find which saleId the user is currently on:
+            string query = @"
+                            SELECT MAX(saleId)
+                            FROM dbo.Sale
+                            WHERE CAST(saleDate AS DATE) = @TodayDate;
+                            ";
+
+            using (SqlConnection connection = new SqlConnection(connString))
+            using (SqlCommand cmd = new SqlCommand(query, connection))
+            {
+                //List all sales made today
+                cmd.Parameters.AddWithValue("@TodayDate", currentDate);
+                connection.Open();
+
+                object result = cmd.ExecuteScalar();
+                if (result != DBNull.Value)
+                {
+                    saleId = Convert.ToInt32(result) + 1;
+                }
+                currentSaleId = saleId;
+            }          
+        }
+        private void GenerateSale()
+        {
+            DateTime currentDateTime = DateTime.Now;
+            int employeeIdColumn = 10; //Make a funciton to get this later
+            int registerColumn = 1; //Make a funciton to get this later
+            currentSaleStatus = "pre-prep";
+            int saleIdColumn = currentSaleId;
+
+            string query = @"
+    INSERT INTO dbo.Sale (
+        saleDate,
+        saleId,
+        employeeId,
+        orderStatus,
+        register
+    )
+    VALUES (
+        @saleDate,
+        @saleId,
+        @employeeId,
+        @orderStatus,
+        @register
+    );
+";
+            using (SqlConnection connection = new SqlConnection(connString))
+            using (SqlCommand cmd = new SqlCommand(query, connection))
+            {
+                cmd.Parameters.AddWithValue("@saleDate", currentDateTime);
+                cmd.Parameters.AddWithValue("@saleId", saleIdColumn);
+                cmd.Parameters.AddWithValue("@employeeId", employeeIdColumn);
+                cmd.Parameters.AddWithValue("@orderStatus", currentSaleStatus);
+                cmd.Parameters.AddWithValue("@register", registerColumn);
+
+                connection.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+        private List<TransactionLineItem> cartItems = new List<TransactionLineItem>();
+        public class TransactionLineItem
+        {
+            public int CardGameId { get; set; }
+            public int CardId { get; set; }
+            public int ConditionId { get; set; }
+            public string CardName { get; set; }
+            public int SetId { get; set; }
+            public decimal TimeMktPrice { get; set; }
+            public decimal AgreedPrice { get; set; }
+            public int AmtTraded { get; set; }
+            public bool BuyOrSell { get; set; }
+        }
         
+        private void SaleTransactionLineSystem()
+        {
+            int employeeIdColumn = 10; //Make a funciton to get this later
+            int registerColumn = 1; //Make a funciton to get this later
+
+            DataTable dt = new DataTable();
+            dt.Columns.Add("Type");              // "Sale" or "Item"
+            dt.Columns.Add("Card Name");
+            dt.Columns.Add("Set ID");
+            dt.Columns.Add("Qty");
+            dt.Columns.Add("Agreed Price");
+            dt.Columns.Add("Market Price");
+            dt.Columns.Add("Total");
+
+            dt.Rows.Add("Sale Info", $"Sale ID: {currentSaleId}", $"Employee ID: {employeeIdColumn}", "", "", "", $"Register: {registerColumn}");
+
+            foreach (var item in cartItems) // cartItems is List<TransactionLineItem>
+            {
+                decimal total = item.AgreedPrice * item.AmtTraded;
+                dt.Rows.Add("Item", item.CardName, item.SetId, item.AmtTraded, item.AgreedPrice, item.TimeMktPrice, total);
+            }
+
+            decimal grandTotal = cartItems.Sum(i => i.AgreedPrice * i.AmtTraded);
+            dt.Rows.Add("TOTAL", "", "", "", "", "", grandTotal);
+
+            dataGridTransactionSystem.DataSource = dt;
+
+            dataGridTransactionSystem.ReadOnly = true;
+            dataGridTransactionSystem.Rows[0].DefaultCellStyle.BackColor = Color.LightBlue; // Sale Info
+            dataGridTransactionSystem.Rows[dataGridTransactionSystem.Rows.Count - 1].DefaultCellStyle.BackColor = Color.LightGray; // Total
+
+        }
+
     }
 }
 

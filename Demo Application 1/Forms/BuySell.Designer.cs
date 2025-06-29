@@ -37,6 +37,7 @@
             this.panel3 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.panel6 = new System.Windows.Forms.Panel();
+            this.tbPrice = new System.Windows.Forms.TextBox();
             this.btnAddCt = new System.Windows.Forms.Button();
             this.lblSaleInfo = new System.Windows.Forms.Label();
             this.lblMktPrice = new System.Windows.Forms.Label();
@@ -44,14 +45,14 @@
             this.imgCardUrl = new System.Windows.Forms.PictureBox();
             this.lblInStock = new System.Windows.Forms.Label();
             this.panel7 = new System.Windows.Forms.Panel();
-            this.listBox1 = new System.Windows.Forms.ListBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.panel5 = new System.Windows.Forms.Panel();
             this.cbCardGame = new System.Windows.Forms.ComboBox();
             this.tbSearchBar = new System.Windows.Forms.TextBox();
-            this.tbPrice = new System.Windows.Forms.TextBox();
+            this.panelTransSales = new System.Windows.Forms.Panel();
+            this.dataGridTransactionSystem = new System.Windows.Forms.DataGridView();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -64,6 +65,8 @@
             this.panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel5.SuspendLayout();
+            this.panelTransSales.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridTransactionSystem)).BeginInit();
             this.SuspendLayout();
             // 
             // cbxProfile
@@ -172,6 +175,17 @@
             this.panel6.Size = new System.Drawing.Size(346, 182);
             this.panel6.TabIndex = 0;
             // 
+            // tbPrice
+            // 
+            this.tbPrice.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.tbPrice.Location = new System.Drawing.Point(164, 75);
+            this.tbPrice.Name = "tbPrice";
+            this.tbPrice.Size = new System.Drawing.Size(100, 20);
+            this.tbPrice.TabIndex = 5;
+            this.tbPrice.MouseClick += new System.Windows.Forms.MouseEventHandler(this.tbPrice_MouseClick);
+            this.tbPrice.TextChanged += new System.EventHandler(this.tbPrice_TextChanged);
+            this.tbPrice.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbPrice_KeyPress);
+            // 
             // btnAddCt
             // 
             this.btnAddCt.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
@@ -244,21 +258,12 @@
             // 
             // panel7
             // 
-            this.panel7.Controls.Add(this.listBox1);
+            this.panel7.Controls.Add(this.panelTransSales);
             this.panel7.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel7.Location = new System.Drawing.Point(3, 191);
             this.panel7.Name = "panel7";
             this.panel7.Size = new System.Drawing.Size(346, 182);
             this.panel7.TabIndex = 1;
-            // 
-            // listBox1
-            // 
-            this.listBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(0, 0);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(346, 182);
-            this.listBox1.TabIndex = 0;
             // 
             // tableLayoutPanel1
             // 
@@ -332,16 +337,26 @@
             this.tbSearchBar.TextChanged += new System.EventHandler(this.tbSearchBar_TextChanged);
             this.tbSearchBar.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbSearchBar_KeyDown);
             // 
-            // tbPrice
+            // panelTransSales
             // 
-            this.tbPrice.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.tbPrice.Location = new System.Drawing.Point(164, 75);
-            this.tbPrice.Name = "tbPrice";
-            this.tbPrice.Size = new System.Drawing.Size(100, 20);
-            this.tbPrice.TabIndex = 5;
-            this.tbPrice.MouseClick += new System.Windows.Forms.MouseEventHandler(this.tbPrice_MouseClick);
-            this.tbPrice.TextChanged += new System.EventHandler(this.tbPrice_TextChanged);
-            this.tbPrice.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbPrice_KeyPress);
+            this.panelTransSales.BackColor = System.Drawing.SystemColors.Info;
+            this.panelTransSales.Controls.Add(this.dataGridTransactionSystem);
+            this.panelTransSales.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelTransSales.Location = new System.Drawing.Point(0, 0);
+            this.panelTransSales.Name = "panelTransSales";
+            this.panelTransSales.Padding = new System.Windows.Forms.Padding(10);
+            this.panelTransSales.Size = new System.Drawing.Size(346, 182);
+            this.panelTransSales.TabIndex = 0;
+            // 
+            // dataGridTransactionSystem
+            // 
+            this.dataGridTransactionSystem.BackgroundColor = System.Drawing.Color.White;
+            this.dataGridTransactionSystem.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridTransactionSystem.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridTransactionSystem.Location = new System.Drawing.Point(10, 10);
+            this.dataGridTransactionSystem.Name = "dataGridTransactionSystem";
+            this.dataGridTransactionSystem.Size = new System.Drawing.Size(326, 162);
+            this.dataGridTransactionSystem.TabIndex = 0;
             // 
             // BuySell
             // 
@@ -370,6 +385,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
+            this.panelTransSales.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridTransactionSystem)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -396,8 +413,9 @@
         private System.Windows.Forms.Button btnSettings;
         private System.Windows.Forms.Label lblMktPrice;
         private System.Windows.Forms.Label lblSaleInfo;
-        private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Button btnAddCt;
         private System.Windows.Forms.TextBox tbPrice;
+        private System.Windows.Forms.Panel panelTransSales;
+        private System.Windows.Forms.DataGridView dataGridTransactionSystem;
     }
 }
