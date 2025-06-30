@@ -35,10 +35,12 @@ namespace Demo_Application_1
         private int selectedSetId;
         private string selectedPriceURL = "";
         private string selectedCardName = "";
+        private string selectedRarity = "";
         private double selectedMktPrice;
         private bool selectedPriceUp2Date = true;
         private double transactionPrice;
-        
+        private int employeeIdColumn = 10; //make something to change later
+        private int registerColumn = 1; //change later
         
 
         //Stuff for returning to HomePage
@@ -59,6 +61,11 @@ namespace Demo_Application_1
 
             //setup for sale / transaction system
             CheckSeller();
+            if (currentSaleStatus !=  null || currentSaleStatus == "finished and paid")
+            {
+                CheckTransactionId();
+            }
+            //these if statements are not connected
             if (string.IsNullOrEmpty(currentSaleStatus) && !(workingOnOrder == true))
             {
                 GenerateSale();// updates the database and creates a row for the Sale table
@@ -235,6 +242,7 @@ namespace Demo_Application_1
                 //gets the selected values (used in pricecheck function)
                 selectedPriceURL = row.Cells["mktPriceURL"].Value?.ToString();
                 selectedPriceUp2Date = Convert.ToBoolean(row.Cells["priceUp2Date"].Value);
+                selectedRarity = row.Cells["rarity"].Value?.ToString();
                 //Format market price onto the label properly and record value
                 string mktPriceRaw = row.Cells["mktPrice"].Value?.ToString();
                 
@@ -401,6 +409,7 @@ namespace Demo_Application_1
                 CardId = selectedCardId,
                 ConditionId = selectedConditionId,
                 CardName = selectedCardName,
+                Rarity = selectedRarity,
                 SetId = selectedSetId,
                 TimeMktPrice = (decimal)selectedMktPrice, //convert to decimal for now
                 AgreedPrice = (decimal)transactionPrice, // same, should fix later
@@ -415,6 +424,7 @@ namespace Demo_Application_1
             if(currentSaleStatus == "pre-prep")
             {
                 currentSaleStatus = "taking order";
+
             }
             btnFinalizeSale.Visible = true;
             SaleTransactionLineSystem();
@@ -561,20 +571,52 @@ namespace Demo_Application_1
 
         //Stuff for the Sale / Transaction system
         private int currentSaleId;
+        private int currentTransactionId;
         private string currentSaleStatus;
         private bool workingOnOrder;
+        private DateTime selectedSellerDateTime;
+        private decimal saleTotal;
+        private void CheckTransactionId()
+        {
+            //the query that will be used to enter into sql server (not finished)
+            string query = @"
+SELECT TOP 1 transactionId
+FROM dbo.TransactionLine
+WHERE saleId = @saleId
+ORDER BY transactionId DESC;";
+            using(SqlConnection connection = new SqlConnection(connString))
+            {
+                connection.Open();
+                using(SqlCommand cmd = new SqlCommand (query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@saleId", currentSaleId);//fills in the blanks / finishes the query
+
+                    object result = cmd.ExecuteScalar();//gets the result of the entered query
+                    if (result != null && result != DBNull.Value)
+                    {
+                        currentTransactionId = Convert.ToInt32(result) + 1;
+                    }
+                    else
+                    {
+                        currentTransactionId = 1; 
+                    }
+                }
+            }
+
+        }
         private void CheckSeller()
         {
             int saleId = 1; //Default if no sales today
             int employeeId = 10; //Fix later, just keep 10 for now
             //Get current date / time
+            DateTime currentDateTime = DateTime.Now;
             DateTime currentDate = DateTime.Now.Date;
 
             //Queries to be used later
             string queryFindLatestSaleId = "SELECT ISNULL(MAX(saleId), 0) FROM dbo.Sale;";
 
             string queryCheckLastSale = @" 
-        SELECT TOP 1 saleId, orderStatus
+        SELECT TOP 1 saleId, orderStatus, saleDate
         FROM dbo.Sale
         WHERE employeeId = @employeeId
         ORDER BY saleDate DESC;
@@ -605,20 +647,23 @@ namespace Demo_Application_1
                         {
                             string lastStatus = reader["orderStatus"] != DBNull.Value
                                 ? reader["orderStatus"].ToString() : null;
-
+                            //check back here
                             // If last sale is null or marked "finished and paid", treat it as done
                             if (string.IsNullOrEmpty(lastStatus) || lastStatus == "finished and paid")
                             {
                                 currentSaleId = saleId + 1;
                                 currentSaleStatus = null;
                                 workingOnOrder = false;
-                            }
+                                selectedSellerDateTime = currentDateTime;
+                            }                           
                             else
                             {
                                 // Still working on previous sale
                                 currentSaleId = Convert.ToInt32(reader["saleId"]);
                                 currentSaleStatus = lastStatus;
                                 workingOnOrder = true;
+                                selectedSellerDateTime = Convert.ToDateTime(reader["saleDate"]);
+
                             }
 
                             return;
@@ -626,9 +671,11 @@ namespace Demo_Application_1
                     }
                 }
                 // 3. If employee has never made a sale, start new one
+                //doesnt get to happen if the return function runs
                 currentSaleId = saleId + 1;
                 currentSaleStatus = null;
                 workingOnOrder = false;
+                selectedSellerDateTime = currentDateTime;
             }
          
         }
@@ -690,7 +737,8 @@ namespace Demo_Application_1
             public decimal TimeMktPrice { get; set; }
             public decimal AgreedPrice { get; set; }
             public int AmtTraded { get; set; }
-            public bool BuyOrSell { get; set; }
+            public bool BuyOrSell { get; set; } //True = Sold to customer, False = Store bought card from customer (set to True for now)
+            public string Rarity { get; set; }
         }
         
         private void SaleTransactionLineSystem()
@@ -701,6 +749,7 @@ namespace Demo_Application_1
             DataTable dt = new DataTable();
             dt.Columns.Add("Type");              // "Sale" or "Item"
             dt.Columns.Add("Card Name");
+            dt.Columns.Add("Rarity");
             dt.Columns.Add("Set ID");
             dt.Columns.Add("Qty");
             dt.Columns.Add("Agreed Price");
@@ -708,19 +757,20 @@ namespace Demo_Application_1
             dt.Columns.Add("Total");
 
             //This is a Sale Info type of row (at the top of the grid)
-            dt.Rows.Add("Sale Info", $"Sale ID: {currentSaleId}", $"Employee ID: {employeeIdColumn}", "", "",
+            dt.Rows.Add("Sale Info", $"Sale ID: {currentSaleId}", $"DateTime: {selectedSellerDateTime}" , $"Employee ID: {employeeIdColumn}", "", "",
                 $"Status: {currentSaleStatus ?? "N/A"}", $"Register: {registerColumn}");
 
             foreach (var item in cartItems) // cartItems is List<TransactionLineItem>
             {
                 decimal total = item.AgreedPrice * item.AmtTraded;
                 //This is an Item type of row (TransactionLine)
-                dt.Rows.Add("Item", item.CardName, item.SetId, item.AmtTraded, item.AgreedPrice.ToString("C2"),
+                dt.Rows.Add("Item", item.CardName, item.Rarity , item.SetId, item.AmtTraded, item.AgreedPrice.ToString("C2"),
                     item.TimeMktPrice.ToString("C2"), total.ToString("C2"));
             }
             //Stuff at the bottom of the row
             decimal grandTotal = cartItems.Sum(i => i.AgreedPrice * i.AmtTraded);
-            dt.Rows.Add("TOTAL", "", "", "", "", "", grandTotal.ToString("C2"));
+            dt.Rows.Add("TOTAL", "", "", "", "", "", "", grandTotal.ToString("C2"));
+            saleTotal = grandTotal;
 
             dataGridTransactionSystem.DataSource = dt;
 
@@ -819,7 +869,7 @@ namespace Demo_Application_1
             }
 
         }
-        private void PlaceTheDamButton() //I cant believe this is the fucking thing that I gave up on first because it was too complicated
+        private void PlaceTheDamButton() 
         {//implement later, just settle for crappy button placement for now
             int rowIndex = dataGridTransactionSystem.Rows.Count - 1; //Find the bottom row
             int columnIndex = dataGridTransactionSystem.Columns.Count - 3;//Find the column (3rd from the right)
@@ -845,14 +895,106 @@ namespace Demo_Application_1
 
             btnFinalizeSale.Visible = true;
         }
-
+        private string transactionLinePreQuery;
         private void TransactionLineLogic()
         {
+            int transactionId = currentTransactionId; //default
+            using(SqlConnection connection = new SqlConnection(connString))
+            {
+                connection.Open();
 
+                foreach (var item in cartItems)
+                {
+                    string query = @"
+                INSERT INTO TransactionLine 
+                (transactionId, saleId, cardGameId, cardId, conditionId, cardName, rarity, setId, timeMktPrice, agreedPrice, amtTraded, buyOrSell)
+                VALUES 
+                (@transactionId, @saleId, @cardGameId, @cardId, @conditionId, @cardName, @rarity, @setId, @timeMktPrice, @agreedPrice, @amtTraded, @buyOrSell)";
+
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@transactionId", currentTransactionId);
+                        ++currentTransactionId;
+                        cmd.Parameters.AddWithValue("@saleId", currentSaleId);
+                        cmd.Parameters.AddWithValue("@cardGameId", item.CardGameId); //remember, this is the number value, not the text
+                        cmd.Parameters.AddWithValue("@cardId", item.CardId);
+                        cmd.Parameters.AddWithValue("@conditionId", item.ConditionId);
+                        cmd.Parameters.AddWithValue("@cardName", item.CardName);
+                        cmd.Parameters.AddWithValue("@rarity", item.Rarity);
+                        cmd.Parameters.AddWithValue("@setId", item.SetId);
+                        cmd.Parameters.AddWithValue("@timeMktPrice", item.TimeMktPrice);
+                        cmd.Parameters.AddWithValue("@agreedPrice", item.AgreedPrice);
+                        cmd.Parameters.AddWithValue("@amtTraded", item.AmtTraded);
+                        cmd.Parameters.AddWithValue("@buyOrSell", item.BuyOrSell);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                connection.Close();
+            }
+            currentSaleStatus = "processing";
+            // The Status column is the 6th column (index 6)
+            dataGridTransactionSystem.Rows[0].Cells[6].Value = $"Status: {currentSaleStatus ?? "N/A"}";
+            MessageBox.Show("Transaction lines saved successfully.");
+        }
+        private void UpdateSaleStatus()
+        {
+            string query = @"
+UPDATE dbo.Sale
+SET orderStatus = @orderStatus
+WHERE saleId = @saleId;"; // took out: AND CAST(saleDate AS DATE) = CAST(@saleDate AS DATE)
+            using (SqlConnection connection = new SqlConnection(connString))
+            {
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@orderStatus", currentSaleStatus);
+                    cmd.Parameters.AddWithValue("@saleId", currentSaleId);
+                    //cmd.Parameters.AddWithValue("@saleDate", selectedSellerDateTime);
+
+                    connection.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    connection.Close();
+
+
+                    MessageBox.Show($"{rowsAffected} sale(s) updated to status '{currentSaleStatus}'.\n" +
+                        $"This is where you should go collect the cards in the back");
+                }
+            }
+        }
+        private void CalcSale()
+        {
+            currentSaleStatus = "finished and paid";
+            string query = @"
+UPDATE dbo.Sale
+SET 
+    orderStatus = @orderStatus,
+    profit = @saleTotal
+WHERE 
+    saleId = @saleId;"; // took out: AND CAST(saleDate AS DATE) = CAST(@saleDate AS DATE)
+            using (SqlConnection connection = new SqlConnection(connString))
+            {
+                connection.Open ();
+                using(SqlCommand cmd = new SqlCommand(query,connection))
+                {
+                    cmd.Parameters.AddWithValue("@orderStatus", currentSaleStatus);
+                    cmd.Parameters.AddWithValue("@saleTotal", saleTotal);
+                    cmd.Parameters.AddWithValue("@saleId", currentSaleId);
+
+                    cmd.ExecuteNonQuery();//finaly, hopefully this will actually work
+                }
+            }
+            MessageBox.Show($"Order {currentSaleId} has been filled. Returning to home now \n" +
+                $"{currentSaleStatus}");
         }
         private void btnFinalizeSale_Click(object sender, EventArgs e)
         {
+            TransactionLineLogic();
+            UpdateSaleStatus();
+            CalcSale();
 
+            workingOnOrder = false;
+            changingTabs = true;
+            NavigationHelper.ReturnToHome(this, _homePage, ref changingTabs);
         }
     }
 }
