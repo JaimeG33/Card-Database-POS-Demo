@@ -237,7 +237,7 @@ namespace Demo_Application_1
                 // Select the row that was clicked
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
                 //gets the selected image url
-                string imageURL = row.Cells["imageURL"].Value?.ToString();
+                string imageURL = row.Cells["imageURL"].Value?.ToString().Trim();
 
                 //gets the selected values (used in pricecheck function)
                 selectedPriceURL = row.Cells["mktPriceURL"].Value?.ToString();
@@ -283,14 +283,29 @@ namespace Demo_Application_1
 
                 if (!string.IsNullOrEmpty(imageURL))
                 {
-                    try
+                    try //the old (simple) method got blocked by tcgplayer
                     {
-                        imgCardUrl.Load(imageURL);
+                        // Create a new HTTP request to the image URL
+                        var request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(imageURL);
+                        // Spoof a browser User-Agent to avoid being blocked by the server (403 Forbidden)
+                        request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)";
+                        // Set a Referer header to make the request appear as if it's coming from a browser visiting TCGPlayer
+                        request.Referer = "https://www.tcgplayer.com/";
+                        // Accept header tells the server what types of content we want (images mostly)
+                        request.Accept = "image/webp,image/apng,image/*,*/*;q=0.8";
+                        // Send the request and get the response (which should contain the image data)
+                        using (var response = request.GetResponse())
+                        // Get the image stream from the response
+                        using (var stream = response.GetResponseStream())
+                        {
+                            // Convert the stream into an Image object and display it in the PictureBox
+                            imgCardUrl.Image = Image.FromStream(stream);
+                        }
                     }
-                    catch
+                    catch (Exception ex) 
                     {
                         imgCardUrl.Image = null;
-                        MessageBox.Show("Unable to load image");
+                        MessageBox.Show($"Unable to load image.\n\nError: {ex.Message}", "Image Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
                 if (clickedColumn == "priceUp2Date")

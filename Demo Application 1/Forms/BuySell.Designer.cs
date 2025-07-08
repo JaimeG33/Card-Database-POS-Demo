@@ -31,12 +31,14 @@
             this.cbxProfile = new System.Windows.Forms.ComboBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.testing = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.btnSettings = new System.Windows.Forms.Button();
             this.panel3 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.panel6 = new System.Windows.Forms.Panel();
+            this.btnFinalizeSale = new System.Windows.Forms.Button();
             this.tbPrice = new System.Windows.Forms.TextBox();
             this.btnAddCt = new System.Windows.Forms.Button();
             this.lblSaleInfo = new System.Windows.Forms.Label();
@@ -53,7 +55,6 @@
             this.panel5 = new System.Windows.Forms.Panel();
             this.cbCardGame = new System.Windows.Forms.ComboBox();
             this.tbSearchBar = new System.Windows.Forms.TextBox();
-            this.btnFinalizeSale = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -96,6 +97,7 @@
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.panel2.Controls.Add(this.testing);
             this.panel2.Controls.Add(this.label1);
             this.panel2.Controls.Add(this.label2);
             this.panel2.Controls.Add(this.btnSettings);
@@ -104,6 +106,13 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(984, 65);
             this.panel2.TabIndex = 4;
+            // 
+            // testing
+            // 
+            this.testing.Location = new System.Drawing.Point(623, 39);
+            this.testing.Name = "testing";
+            this.testing.Size = new System.Drawing.Size(100, 20);
+            this.testing.TabIndex = 2;
             // 
             // label1
             // 
@@ -176,6 +185,17 @@
             this.panel6.Name = "panel6";
             this.panel6.Size = new System.Drawing.Size(346, 182);
             this.panel6.TabIndex = 0;
+            // 
+            // btnFinalizeSale
+            // 
+            this.btnFinalizeSale.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.btnFinalizeSale.Location = new System.Drawing.Point(236, 158);
+            this.btnFinalizeSale.Name = "btnFinalizeSale";
+            this.btnFinalizeSale.Size = new System.Drawing.Size(100, 23);
+            this.btnFinalizeSale.TabIndex = 6;
+            this.btnFinalizeSale.Text = "Finalize Sale";
+            this.btnFinalizeSale.UseVisualStyleBackColor = true;
+            this.btnFinalizeSale.Click += new System.EventHandler(this.btnFinalizeSale_Click);
             // 
             // tbPrice
             // 
@@ -364,17 +384,6 @@
             this.tbSearchBar.TextChanged += new System.EventHandler(this.tbSearchBar_TextChanged);
             this.tbSearchBar.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbSearchBar_KeyDown);
             // 
-            // btnFinalizeSale
-            // 
-            this.btnFinalizeSale.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.btnFinalizeSale.Location = new System.Drawing.Point(236, 158);
-            this.btnFinalizeSale.Name = "btnFinalizeSale";
-            this.btnFinalizeSale.Size = new System.Drawing.Size(100, 23);
-            this.btnFinalizeSale.TabIndex = 6;
-            this.btnFinalizeSale.Text = "Finalize Sale";
-            this.btnFinalizeSale.UseVisualStyleBackColor = true;
-            this.btnFinalizeSale.Click += new System.EventHandler(this.btnFinalizeSale_Click);
-            // 
             // BuySell
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -435,5 +444,6 @@
         private System.Windows.Forms.Panel panelTransSales;
         private System.Windows.Forms.DataGridView dataGridTransactionSystem;
         private System.Windows.Forms.Button btnFinalizeSale;
+        private System.Windows.Forms.TextBox testing;
     }
 }
