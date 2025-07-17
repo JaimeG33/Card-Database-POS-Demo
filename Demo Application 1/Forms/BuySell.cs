@@ -39,6 +39,7 @@ namespace Demo_Application_1
         private double selectedMktPrice;
         private bool selectedPriceUp2Date = true;
         private double transactionPrice;
+        private double transactionAmt = 1; // Default Value
         private int employeeIdColumn = 10; //make something to change later
         private int registerColumn = 1; //change later
         
@@ -110,6 +111,9 @@ namespace Demo_Application_1
 
                 //Position tbPrice text box
                 tbPrice.Location = new Point(lblMktPrice.Left, lblMktPrice.Bottom + 10);
+
+                //Position tbAmtTraded text box
+                tbAmtTraded.Location = new Point(lblMktPrice.Right + 25, lblMktPrice.Bottom + 10);
 
                 //Position add2cart button
                 btnAddCt.Location = new Point(tbPrice.Left, tbPrice.Bottom + 10);
@@ -426,10 +430,10 @@ namespace Demo_Application_1
                 CardName = selectedCardName,
                 Rarity = selectedRarity,
                 SetId = selectedSetId,
-                TimeMktPrice = (decimal)selectedMktPrice, //convert to decimal for now
-                AgreedPrice = (decimal)transactionPrice, // same, should fix later
-                AmtTraded = 1, //add amount funtionality later
-                BuyOrSell = true // true = store is selling
+                TimeMktPrice = (decimal)selectedMktPrice, 
+                AgreedPrice = (decimal)transactionPrice, 
+                AmtTraded = (int)transactionAmt, 
+                BuyOrSell = true // true = store is selling,         false = store is buying item from customer
             };
 
             // 2. Add to cart
@@ -583,6 +587,32 @@ namespace Demo_Application_1
             // Reattach handler
             tbPrice.TextChanged += tbPrice_TextChanged;
         }
+
+        private void tbAmtTraded_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Allow only digits, backspace, and delete
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true; // Block everything else
+            }
+        }
+        private void tbAmtTraded_TextChanged(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(tbAmtTraded.Text))
+            {
+                transactionAmt = Convert.ToInt16(tbAmtTraded.Text);
+            }
+            else if (Convert.ToInt16(tbAmtTraded.Text) == 0)
+            {
+                transactionAmt = 1;
+            }
+            else
+            {
+                transactionAmt = 1;
+            }
+            
+        }
+
 
         //Stuff for the Sale / Transaction system
         private int currentSaleId;
@@ -884,33 +914,7 @@ ORDER BY transactionId DESC;";
             }
 
         }
-        private void PlaceTheDamButton() 
-        {//implement later, just settle for crappy button placement for now
-            int rowIndex = dataGridTransactionSystem.Rows.Count - 1; //Find the bottom row
-            int columnIndex = dataGridTransactionSystem.Columns.Count - 3;//Find the column (3rd from the right)
 
-            if (rowIndex < 0 || columnIndex < 0)
-            {
-                return; //ignore title rows / columns
-            }
-
-            // Find the cell's rectangle
-            Rectangle cellRect = dataGridTransactionSystem.GetCellDisplayRectangle(columnIndex, rowIndex, true);
-            
-            // Convert to screen coordinates, then to form
-            Point cellLocation = dataGridTransactionSystem.PointToScreen(cellRect.Location);
-            Point buttonLocation = this.PointToClient(cellLocation);
-
-            // Move / size the button
-            btnFinalizeSale.SetBounds(
-                buttonLocation.X,
-                buttonLocation.Y,
-                cellRect.Width,
-                cellRect.Height);
-
-            btnFinalizeSale.Visible = true;
-        }
-        private string transactionLinePreQuery;
         private void TransactionLineLogic()
         {
             int transactionId = currentTransactionId; //default
@@ -1011,6 +1015,8 @@ WHERE
             changingTabs = true;
             NavigationHelper.ReturnToHome(this, _homePage, ref changingTabs);
         }
+
+
     }
 }
 
