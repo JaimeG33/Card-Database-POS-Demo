@@ -221,6 +221,7 @@
             this.btnAddCt.Text = "Add to Cart";
             this.btnAddCt.UseVisualStyleBackColor = true;
             this.btnAddCt.Click += new System.EventHandler(this.btnAddCt_Click);
+            this.btnAddCt.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnAddCt_MouseDown);
             // 
             // lblSaleInfo
             // 

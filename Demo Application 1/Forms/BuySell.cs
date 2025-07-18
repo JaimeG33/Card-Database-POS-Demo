@@ -38,6 +38,7 @@ namespace Demo_Application_1
         private string selectedRarity = "";
         private double selectedMktPrice;
         private bool selectedPriceUp2Date = true;
+        private bool modeBuySell = true;
         private double transactionPrice;
         private double transactionAmt = 1; // Default Value
         private int employeeIdColumn = 10; //make something to change later
@@ -417,11 +418,31 @@ namespace Demo_Application_1
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
         }
 
+        private void btnAddCt_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Left click = normal add to cart (sell item to customer) (default)
+                modeBuySell = true;
+            }
+            else if (e.Button == MouseButtons.Right)
+            {
+                // Right click = buy item from customer 
+                modeBuySell = false;
+                btnAddCt_Click(sender, EventArgs.Empty); // Need to manually run the on_click function because right clicking it doesnt run it
+            }
+        }
         private void btnAddCt_Click(object sender, EventArgs e)
         {
             UpdatePrice(); //First update the price if needed to make sure its accurate
 
-            // 1. Collect input from your form (dropdowns, textboxes, etc.)
+            // Check to see if the item is being bought or sold
+            decimal finalValue = Convert.ToDecimal(transactionPrice);
+            if (modeBuySell == false)
+            {
+                finalValue = finalValue * -1;
+            }
+            // 1. Collect input from form (dropdowns, textboxes, etc.)
             TransactionLineItem newItem = new TransactionLineItem
             {
                 CardGameId = selectedCardGame,
@@ -431,9 +452,9 @@ namespace Demo_Application_1
                 Rarity = selectedRarity,
                 SetId = selectedSetId,
                 TimeMktPrice = (decimal)selectedMktPrice, 
-                AgreedPrice = (decimal)transactionPrice, 
+                AgreedPrice = finalValue, 
                 AmtTraded = (int)transactionAmt, 
-                BuyOrSell = true // true = store is selling,         false = store is buying item from customer
+                BuyOrSell = modeBuySell // true = store is selling,         false = store is buying item from customer
             };
 
             // 2. Add to cart
