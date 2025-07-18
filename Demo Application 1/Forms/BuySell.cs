@@ -847,34 +847,52 @@ ORDER BY transactionId DESC;";
         private void dataGridTransactionSystem_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             var row = dataGridTransactionSystem.Rows[e.RowIndex];
-            if (row.Cells[0].Value.ToString() != "Item") return; // Ignore non-item types of rows
+            if (row.Cells[0].Value.ToString() != "Item") return; // Ignore non-item rows
 
-            // Parse the new agreed price
-            if (decimal.TryParse(row.Cells["Agreed Price"].Value.ToString(), out decimal newPrice))
+            string cardName = row.Cells["Card Name"].Value.ToString();
+            int setId = Convert.ToInt32(row.Cells["Set ID"].Value);
+
+            var item = cartItems.FirstOrDefault(i => i.CardName == cardName && i.SetId == setId);
+            if (item == null) return;
+
+            // Try updating quantity (AmtTraded)
+            if (int.TryParse(row.Cells["Qty"].Value?.ToString(), out int newQty))
             {
-                string cardName = row.Cells["Card Name"].Value.ToString();
-                int setId = Convert.ToInt32( row.Cells["Set ID"].Value);
+                item.AmtTraded = newQty;
+            }
 
-                var item = cartItems.FirstOrDefault(i => i.CardName == cardName && i.SetId == setId);
-                if (item != null)
-                {
-                    item.AgreedPrice = newPrice;
+            // Try parsing Agreed Price
+            string priceText = row.Cells["Agreed Price"].Value.ToString();
+            decimal newPrice;
 
-                    // Update Total column 
-                    decimal total = item.AgreedPrice * item.AmtTraded;
-                    row.Cells["Total"].Value = total.ToString("C2");
-
-                    // Update grand total
-                    decimal grandTotal = cartItems.Sum(i => i.AgreedPrice * i.AmtTraded);
-                    var totalRow = dataGridTransactionSystem.Rows[dataGridTransactionSystem.Rows.Count - 1];
-                    totalRow.Cells["Total"].Value = grandTotal.ToString("C2");
-                }
+            if (decimal.TryParse(priceText, out newPrice))
+            {
+                item.AgreedPrice = newPrice;
+            }
+            else if (priceText.StartsWith("$") &&
+                     decimal.TryParse(priceText.TrimStart('$'), out decimal parsedPrice))
+            {
+                item.AgreedPrice = parsedPrice;
             }
             else
             {
                 MessageBox.Show("Please enter a valid decimal price.");
-                row.Cells["Agreed Price"].Value = ""; // Clear invalid input
+                row.Cells["Agreed Price"].Value = ""; // Reset invalid input
+                return;
             }
+
+            // Update total for the row
+            decimal total = item.AgreedPrice * item.AmtTraded;
+            row.Cells["Total"].Value = total.ToString("C2");
+
+            // Update grand total
+            decimal grandTotal = cartItems.Sum(i => i.AgreedPrice * i.AmtTraded);
+            var totalRow = dataGridTransactionSystem.Rows[dataGridTransactionSystem.Rows.Count - 1];
+            totalRow.Cells["Total"].Value = grandTotal.ToString("C2");
+
+            // Optional: Force UI refresh of the grid
+            dataGridTransactionSystem.InvalidateRow(e.RowIndex); // Only refresh the edited row
+            // Or use: dataGridTransactionSystem.Refresh(); // Full grid refresh (heavier)
         }
 
         private void dataGridTransactionSystem_CellContentClick(object sender, DataGridViewCellEventArgs e)
