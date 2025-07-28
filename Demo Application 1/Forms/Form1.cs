@@ -25,7 +25,7 @@ namespace Demo_Application_1
             if (string.IsNullOrEmpty(Properties.Settings.Default.ServerIp) )
             {
                 string input = Microsoft.VisualBasic.Interaction.InputBox( //must add Microsoft.VisualBasic in the References for this to work
-                    "Enter the SQL Server IP address:", "Server IP Required", "127.0.0.1");
+                    "Enter the SQL Server IPv4 address:", "Server IP Required", "127.0.0.1");
 
                 if (!string.IsNullOrEmpty(input) )
                 {
