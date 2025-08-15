@@ -14,6 +14,7 @@ namespace Demo_Application_1
 {
     public partial class Form1 : Form
     {
+
         public Form1()
         {
             InitializeComponent();
@@ -38,6 +39,9 @@ namespace Demo_Application_1
                     Application.Exit();
                 }
             }
+
+            // Censor the password field
+            tbPswd.PasswordChar = '*';
         }
 
 
@@ -52,7 +56,7 @@ namespace Demo_Application_1
             public bool TryConnect(string username, string password, out string message)
             {
                 // Builds connection string using the user's input
-                //Current ipAddress = 192.168.1.153
+                //Current ipAddress = 192.168.1.158
                 string serverIP = Properties.Settings.Default.ServerIp;
                 connectionString = string.Format("Server={2}\\SQLEXPRESS;Database=Revised Demo Database CAv2;User Id={0};Password={1};", username, password, serverIP);
                 //Connection String Explained
@@ -136,6 +140,47 @@ namespace Demo_Application_1
                 //Runs the btnLogin_Click method
                            //(Needs the dummy paramaters)
                 btnLogin_Click(this, EventArgs.Empty);
+            }
+        }
+
+        private void cbHash_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cbHash.Checked)
+            {
+                // Show password as plain text
+                tbPswd.PasswordChar = '\0'; // \0 is the null character, which means no masking
+            }
+            else
+            {
+                // Mask password
+                tbPswd.PasswordChar = '*'; // Use '*' or any other character to mask the password
+            }
+        }
+
+        private void ResetIpv4Address()
+        {
+            // Reset the saved IP address
+            Properties.Settings.Default.ServerIp = string.Empty;
+            Properties.Settings.Default.Save();
+            MessageBox.Show("IP address reset successfully. The application will now close.");
+            Application.Exit(); // Forces re-entry of IP on next start
+
+        }
+        private void btnResetIp_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show
+                ("This will delete the saved Ip Address and make you enter it again to log in",
+                    "Confirm Reset (This will exit the application)",
+                    MessageBoxButtons.OKCancel,
+                    MessageBoxIcon.Warning
+                );
+            if (result == DialogResult.OK)
+            {
+                ResetIpv4Address();
+            }
+            else
+            {
+                MessageBox.Show("Cancelled");
             }
         }
     }

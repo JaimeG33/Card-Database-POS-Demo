@@ -34,6 +34,9 @@
             this.tbPswd = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.btnLogin = new System.Windows.Forms.Button();
+            this.cbHash = new System.Windows.Forms.CheckBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.btnResetIp = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -85,7 +88,7 @@
             // 
             // btnLogin
             // 
-            this.btnLogin.Location = new System.Drawing.Point(511, 132);
+            this.btnLogin.Location = new System.Drawing.Point(524, 132);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(92, 53);
             this.btnLogin.TabIndex = 5;
@@ -93,11 +96,43 @@
             this.btnLogin.UseVisualStyleBackColor = true;
             this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
             // 
+            // cbHash
+            // 
+            this.cbHash.AutoSize = true;
+            this.cbHash.Location = new System.Drawing.Point(495, 172);
+            this.cbHash.Name = "cbHash";
+            this.cbHash.Size = new System.Drawing.Size(15, 14);
+            this.cbHash.TabIndex = 6;
+            this.cbHash.UseVisualStyleBackColor = true;
+            this.cbHash.CheckedChanged += new System.EventHandler(this.cbHash_CheckedChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(463, 189);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(83, 13);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "Show Password";
+            // 
+            // btnResetIp
+            // 
+            this.btnResetIp.Location = new System.Drawing.Point(713, 12);
+            this.btnResetIp.Name = "btnResetIp";
+            this.btnResetIp.Size = new System.Drawing.Size(75, 23);
+            this.btnResetIp.TabIndex = 8;
+            this.btnResetIp.Text = "Reset IP";
+            this.btnResetIp.UseVisualStyleBackColor = true;
+            this.btnResetIp.Click += new System.EventHandler(this.btnResetIp_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnResetIp);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.cbHash);
             this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.tbPswd);
@@ -120,6 +155,9 @@
         private System.Windows.Forms.TextBox tbPswd;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnLogin;
+        private System.Windows.Forms.CheckBox cbHash;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button btnResetIp;
     }
 }
 
