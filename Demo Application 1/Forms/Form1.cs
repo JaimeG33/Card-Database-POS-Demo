@@ -26,7 +26,7 @@ namespace Demo_Application_1
             if (string.IsNullOrEmpty(Properties.Settings.Default.ServerIp) )
             {
                 string input = Microsoft.VisualBasic.Interaction.InputBox( //must add Microsoft.VisualBasic in the References for this to work
-                    "Enter the SQL Server IPv4 address:", "Server IP Required", "127.0.0.1");
+                    "Enter the SQL Server IPv4 address:", "Server IP Required", "xxx.xxx.x.xxx");
 
                 if (!string.IsNullOrEmpty(input) )
                 {
@@ -40,7 +40,7 @@ namespace Demo_Application_1
                 }
             }
 
-            // Censor the password field
+            // Censor the password box
             tbPswd.PasswordChar = '*';
         }
 
@@ -56,7 +56,6 @@ namespace Demo_Application_1
             public bool TryConnect(string username, string password, out string message)
             {
                 // Builds connection string using the user's input
-                //Current ipAddress = 192.168.1.158
                 string serverIP = Properties.Settings.Default.ServerIp;
                 connectionString = string.Format("Server={2}\\SQLEXPRESS;Database=Revised Demo Database CAv2;User Id={0};Password={1};", username, password, serverIP);
                 //Connection String Explained

@@ -1,4 +1,12 @@
-﻿using System;
+﻿using Demo_Application_1.Helpers;
+using HtmlAgilityPack; //the NuGet package downloaded to scrape websites
+using Microsoft.Win32;
+using OpenQA.Selenium;//The Selenium packages are nessisary to access tcgplayer data without an api
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -9,13 +17,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Demo_Application_1.Helpers;
-using HtmlAgilityPack; //the NuGet package downloaded to scrape websites
-using Microsoft.Win32;
-using OpenQA.Selenium;//The Selenium packages are nessisary to access tcgplayer data without an api
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers;
 
 
 namespace Demo_Application_1
@@ -33,6 +34,7 @@ namespace Demo_Application_1
         private int selectedConditionId;
         private int selectedCardId;
         private int selectedSetId;
+        private int selectedAmtInStock;
         private string selectedPriceURL = "";
         private string selectedCardName = "";
         private string selectedRarity = "";
@@ -244,7 +246,8 @@ namespace Demo_Application_1
                 //gets the selected image url
                 string imageURL = row.Cells["imageURL"].Value?.ToString().Trim();
 
-                //gets the selected values (used in pricecheck function)
+                //gets the selected values (used in pricecheck function) 
+                selectedAmtInStock = Convert.ToInt32(row.Cells["amtInStock"].Value?.ToString());
                 selectedPriceURL = row.Cells["mktPriceURL"].Value?.ToString();
                 selectedPriceUp2Date = Convert.ToBoolean(row.Cells["priceUp2Date"].Value);
                 selectedRarity = row.Cells["rarity"].Value?.ToString();
@@ -860,6 +863,9 @@ ORDER BY transactionId DESC;";
             dataGridTransactionSystem.Rows[0].DefaultCellStyle.BackColor = Color.LightBlue; // Sale Info
             dataGridTransactionSystem.Rows[dataGridTransactionSystem.Rows.Count - 1].DefaultCellStyle.
                 BackColor = Color.LightGray; // Total
+            //Quantity check to see if the amount of cards requested is more than the amount in stock
+
+
             //also prevent user from adding new rows manually (might allow later, idk yet)
             dataGridTransactionSystem.AllowUserToAddRows = false;
 
@@ -957,11 +963,13 @@ ORDER BY transactionId DESC;";
         private void TransactionLineLogic()
         {
             int transactionId = currentTransactionId; //default
-            using(SqlConnection connection = new SqlConnection(connString))
+
+            // Use the cartItems list to write sql queries to insert into the database
+            using (SqlConnection connection = new SqlConnection(connString))
             {
                 connection.Open();
-
-                foreach (var item in cartItems)
+                // Step 1: TractionLine Table
+                foreach (var item in cartItems) // Loop through all entries in the cartItems list to write them down as lines of the sql query
                 {
                     string query = @"
                 INSERT INTO TransactionLine 
@@ -988,8 +996,65 @@ ORDER BY transactionId DESC;";
                         cmd.ExecuteNonQuery();
                     }
                 }
+
+                //Step 2: Update amtInStock columns of affected _Inventory tables
+                // Assemble values of cartItems into batches, then create another sql query to update the amtInStock collumns of the affected tables
+                var grouped = cartItems.GroupBy(x => x.CardGameId);
+
+                foreach (var group in grouped)
+                {
+                    string tableName;
+                    switch (group.Key)
+                    {
+                        case 1: // Yugioh
+                            tableName = "YugiohInventory";
+                            break;
+                        case 2: // Magic
+                            tableName = "MagicInventory";
+                            break;
+                        case 3: // Pokemon
+                            tableName = "PokemonInventory";
+                            break;
+                        default:
+                            continue; // Skip if not a valid card game
+                    }
+
+                    // Assemble sql querys to update the amtInStock collumns of the affected tables
+                    var sb = new StringBuilder();
+                    var idList = new List<int>(); // Keep track of all cardIds for WHERE clause
+
+                    // Start building UPDATE query
+                    sb.Append($"UPDATE {tableName} SET amtInStock = amtInStock + CASE cardId ");
+
+                    // CASE WHEN for each item in the group
+                    foreach (var item in group)
+                    {
+                        // If buyOrSell = true → shop sold → decrease stock
+                        // If buyOrSell = false → shop bought → increase stock
+                        int stockChange = item.BuyOrSell ? -item.AmtTraded : item.AmtTraded;
+
+                        // Add a CASE entry: WHEN {cardId} THEN {amount to add/subtract}
+                        sb.Append($"WHEN {item.CardId} THEN {stockChange} ");
+
+                        // Track cardId for the WHERE clause
+                        idList.Add(item.CardId);
+                    }
+
+                    // Close out the CASE expression and add WHERE with all cardIds
+                    sb.Append("END WHERE cardId IN (");
+                    sb.Append(string.Join(",", idList)); // e.g., (111,222,333)
+                    sb.Append(");");
+
+                    // Execute the single batched UPDATE statement
+                    using (SqlCommand cmdUpdate = new SqlCommand(sb.ToString(), connection))
+                    {
+                        cmdUpdate.ExecuteNonQuery();
+                    }
+                }
                 connection.Close();
             }
+            // Step 3: Refresh DataGridView
+            // Update the DataGridView to show the new transaction lines in the UI
             currentSaleStatus = "processing";
             // The Status column is the 6th column (index 6)
             dataGridTransactionSystem.Rows[0].Cells[6].Value = $"Status: {currentSaleStatus ?? "N/A"}";
@@ -1055,7 +1120,10 @@ WHERE
             NavigationHelper.ReturnToHome(this, _homePage, ref changingTabs);
         }
 
+        private void panel6_Paint(object sender, PaintEventArgs e)
+        {
 
+        }
     }
 }
 
