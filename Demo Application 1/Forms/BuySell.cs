@@ -13,6 +13,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -435,6 +436,7 @@ namespace Demo_Application_1
                 btnAddCt_Click(sender, EventArgs.Empty); // Need to manually run the on_click function because right clicking it doesnt run it
             }
         }
+   
         private void btnAddCt_Click(object sender, EventArgs e)
         {
             UpdatePrice(); //First update the price if needed to make sure its accurate
@@ -456,7 +458,8 @@ namespace Demo_Application_1
                 SetId = selectedSetId,
                 TimeMktPrice = (decimal)selectedMktPrice, 
                 AgreedPrice = finalValue, 
-                AmtTraded = (int)transactionAmt, 
+                AmtTraded = (int)transactionAmt,
+                AmtInStock = selectedAmtInStock, // This value is only used by the ColorIndicator in the UI
                 BuyOrSell = modeBuySell // true = store is selling,         false = store is buying item from customer
             };
 
@@ -796,6 +799,7 @@ ORDER BY transactionId DESC;";
             
         }
         private List<TransactionLineItem> cartItems = new List<TransactionLineItem>(); //The list representing the selected items added to cart 
+        // Each item selected from the available inventory will be added to this list as a TransactionLineItem object
         public class TransactionLineItem //(TransactioLine)
         {
             public int CardGameId { get; set; }
@@ -806,10 +810,13 @@ ORDER BY transactionId DESC;";
             public decimal TimeMktPrice { get; set; }
             public decimal AgreedPrice { get; set; }
             public int AmtTraded { get; set; }
+            public int AmtInStock { get; set; }
             public bool BuyOrSell { get; set; } //True = Sold to customer, False = Store bought card from customer (set to True for now)
             public string Rarity { get; set; }
         }
-        
+
+      
+
         private void SaleTransactionLineSystem()
         {
             int employeeIdColumn = 10; //Make a funciton to get this later
@@ -817,6 +824,7 @@ ORDER BY transactionId DESC;";
 
             DataTable dt = new DataTable();
             dt.Columns.Add("Type");              // "Sale" or "Item"
+            dt.Columns.Add("Buy/Sell");
             dt.Columns.Add("Card Name");
             dt.Columns.Add("Rarity");
             dt.Columns.Add("Set ID");
@@ -826,19 +834,29 @@ ORDER BY transactionId DESC;";
             dt.Columns.Add("Total");
 
             //This is a Sale Info type of row (at the top of the grid)
-            dt.Rows.Add("Sale Info", $"Sale ID: {currentSaleId}", $"DateTime: {selectedSellerDateTime}" , $"Employee ID: {employeeIdColumn}", "", "",
+            dt.Rows.Add("Sale Info", $"Sale ID: {currentSaleId}"," ", $"DateTime: {selectedSellerDateTime}" , $"Employee ID: {employeeIdColumn}", "", "",
                 $"Status: {currentSaleStatus ?? "N/A"}", $"Register: {registerColumn}");
 
             foreach (var item in cartItems) // cartItems is List<TransactionLineItem>
             {
                 decimal total = item.AgreedPrice * item.AmtTraded;
+                string buySell;
+                if (item.BuyOrSell == true)
+                {
+                    buySell = "(Sell)";
+                }
+                else
+                {
+                    buySell = "(Buy)";
+                }
                 //This is an Item type of row (TransactionLine)
-                dt.Rows.Add("Item", item.CardName, item.Rarity , item.SetId, item.AmtTraded, item.AgreedPrice.ToString("C2"),
-                    item.TimeMktPrice.ToString("C2"), total.ToString("C2"));
+                // This adds a new row to the DataTable for each item in the cart (gets looped for each item in the cart)
+                dt.Rows.Add("Item", buySell, item.CardName, item.Rarity, item.SetId, item.AmtTraded, item.AgreedPrice.ToString("C2"),
+                        item.TimeMktPrice.ToString("C2"), total.ToString("C2"));                
             }
             //Stuff at the bottom of the row
             decimal grandTotal = cartItems.Sum(i => i.AgreedPrice * i.AmtTraded);
-            dt.Rows.Add("TOTAL", "", "", "", "", "", "", grandTotal.ToString("C2"));
+            dt.Rows.Add("TOTAL", "", "", "", "", "", "", "", grandTotal.ToString("C2"));
             saleTotal = grandTotal;
 
             dataGridTransactionSystem.DataSource = dt;
@@ -851,6 +869,17 @@ ORDER BY transactionId DESC;";
                 if (cellValue != null && cellValue.ToString() == "Item")
                 {
                     row.Cells["Agreed Price"].ReadOnly = false;
+
+                    int transactionLineItemIndex = i - 1; //The corosponding value in the list
+                    if (transactionLineItemIndex >= 0 && transactionLineItemIndex < cartItems.Count)
+                    {
+                        var item = cartItems[transactionLineItemIndex];
+                        if (item.BuyOrSell == true && item.AmtTraded > item.AmtInStock)
+                        {
+                            // Change background color to light red if quantity exceeds stock
+                            row.DefaultCellStyle.BackColor = Color.Red;
+                        }
+                    }
                 }
                 else
                 {
@@ -864,13 +893,19 @@ ORDER BY transactionId DESC;";
             dataGridTransactionSystem.Rows[dataGridTransactionSystem.Rows.Count - 1].DefaultCellStyle.
                 BackColor = Color.LightGray; // Total
             //Quantity check to see if the amount of cards requested is more than the amount in stock
-
+            
 
             //also prevent user from adding new rows manually (might allow later, idk yet)
             dataGridTransactionSystem.AllowUserToAddRows = false;
 
         }
         
+        private void QuantityColorIndicator()
+        {
+
+        }
+
+
         private void dataGridTransactionSystem_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             var row = dataGridTransactionSystem.Rows[e.RowIndex];
