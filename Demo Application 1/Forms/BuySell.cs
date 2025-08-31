@@ -899,11 +899,7 @@ ORDER BY transactionId DESC;";
             dataGridTransactionSystem.AllowUserToAddRows = false;
 
         }
-        
-        private void QuantityColorIndicator()
-        {
 
-        }
 
 
         private void dataGridTransactionSystem_CellEndEdit(object sender, DataGridViewCellEventArgs e)
@@ -1156,6 +1152,11 @@ WHERE
         }
 
         private void panel6_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void imgCardUrl_Click(object sender, EventArgs e)
         {
 
         }

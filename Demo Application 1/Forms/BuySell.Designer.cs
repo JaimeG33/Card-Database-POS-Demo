@@ -271,6 +271,7 @@
             this.imgCardUrl.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.imgCardUrl.TabIndex = 0;
             this.imgCardUrl.TabStop = false;
+            this.imgCardUrl.Click += new System.EventHandler(this.imgCardUrl_Click);
             // 
             // lblInStock
             // 
