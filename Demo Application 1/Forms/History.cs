@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Security.AccessControl;
@@ -20,6 +21,8 @@ namespace Demo_Application_1
         private void History_Load(object sender, EventArgs e)
         {
             changingTabs = false;
+
+            
 
             //Form Size
             this.WindowState = FormWindowState.Maximized;
@@ -43,10 +46,20 @@ namespace Demo_Application_1
             // Set default times
             dtpStart.Value = DateTime.Today.AddHours(14);      // 2:00 PM
             dtpEnd.Value = DateTime.Today.AddHours(23).AddMinutes(30); // 11:30 PM
+
+            // Setup and fill chart with basic sales data
+            if (chart1.Series.Count == 0)
+            {
+                chart1.Series.Add("Profit Over Time");
+            }
+
+            SetupChart_BasicSalesData();
+            FillChart_BasicSalesData();
         }
-        
+
 
         //    ---------------------------------------------------  Important Variables  -------------------------------------------------------------------------------
+
         public string selectedTimeFrame = "Custom"; // Default Time Frame is today from 2:00PM to 11:30PM
 
         public DateTime startDate;
@@ -70,12 +83,12 @@ namespace Demo_Application_1
             public int register { get; set; }
             public int customerId { get; set; }
         }
-        private List<GeneralSales> generalSales = new List<GeneralSales>();
-        public class GeneralSales
+        public class SaleProfitPoint
         {
-            public DateTime saleDate { get; set; }
-            public decimal revenue { get; set; }
+            public DateTime SaleDate { get; set; }
+            public decimal Profit { get; set; }
         }
+        List<SaleProfitPoint> points = new List<SaleProfitPoint>();
 
 
         //Stuff to accept a reference to the HomePage (Different from the other tabs)
@@ -83,7 +96,7 @@ namespace Demo_Application_1
         private HomePage _homePage;
         private bool changingTabs = false;
         //    ----------------------------------------------------------------------  Page Setup  --------------------------------------------------------------------------------
-        public History (string connectionString, HomePage homePage)
+        public History (string connectionString, HomePage homePage) //Constructor must be updated to accept HomePage reference
         {
             InitializeComponent ();
             connString = connectionString;
@@ -221,6 +234,30 @@ namespace Demo_Application_1
 
 
         // ----------------------------------------------------------  Charts and Info  ----------------------------------------------------------------------------------
+        private void cbChart_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch(cbChart.Text)
+            {
+                case "Basic Sales Data":
+                    // First clear existing points
+                    chart1.Series[0].Points.Clear();
+                    // Then set up the series and title
+                    chart1.Series[0].Name = "Profit Over Time";
+                    if (chart1.Titles.Count == 0)
+                    {
+                        chart1.Titles.Add("Profit Over Time");
+                    }
+                    else
+                    {
+                        chart1.Titles[0].Text = "Profit Over Time";
+                    }
+                    points.Clear();
+                    SetupChart_BasicSalesData();
+                    FillChart_BasicSalesData();
+                    UpdateChart_xAxis();
+                    break;
+            }
+        }
 
         private void UpdateChart_xAxis()
         {
@@ -230,16 +267,71 @@ namespace Demo_Application_1
             chart1.ChartAreas[0].AxisX.LabelStyle.Format = "MM/dd HH:mm"; // Optional: format for DateTime axis
         }
 
+        private void FillChart_BasicSalesData()
+        {
+            // Add each point from the points list
+            foreach (var pt in points)
+            {
+                chart1.Series[0].Points.AddXY(pt.SaleDate.ToOADate(), pt.Profit);
+            }
 
+            // Refresh the chart to display the new data
+            chart1.Series[0].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+        }
 
 
 
 
 
         // ------------------------------------------------------------------  SQL Stuff  -----------------------------------------------------------------------------------------
+        // This one only shows basic info for now (profit and time)
+        public string basicQuery = @"
+    SELECT saleDate, profit
+    FROM Sale
+    WHERE saleDate BETWEEN @startDate AND @endDate
+    ORDER BY saleDate ASC;";
 
+        // BETWEEN 'startDate' AND 'endDate'
 
+        private void SetupChart_BasicSalesData()
+        { 
+            using (SqlConnection conn = new SqlConnection(connString))
+            {
+                try
+                {
+                    conn.Open();
+                    //enter the query
 
+                    using (SqlCommand cmd = new SqlCommand(basicQuery, conn))
+                    {
+                        // Pass C# DateTime values to SQL
+                        cmd.Parameters.AddWithValue("@startDate", startDate);
+                        cmd.Parameters.AddWithValue("@endDate", endDate);
 
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                points.Add(new SaleProfitPoint
+                                {
+                                    SaleDate = reader.GetDateTime(0),
+                                    Profit = reader.GetDecimal(1)
+                                });
+                            }
+                            
+                        }
+                        //Testing
+                        //MessageBox.Show($"Loaded {points.Count} points from DB");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error loading inventory: " + ex.Message);
+                }
+            }
+                
+        }
+
+        
     }
 }
