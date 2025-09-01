@@ -143,6 +143,12 @@
     <Compile Include="Forms\HomePage.Designer.cs">
       <DependentUpon>HomePage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Inventory.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Inventory.Designer.cs">
+      <DependentUpon>Inventory.cs</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\NavigationHelper.cs" />
     <Compile Include="Helpers\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -157,6 +163,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\HomePage.resx">
       <DependentUpon>HomePage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Inventory.resx">
+      <DependentUpon>Inventory.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

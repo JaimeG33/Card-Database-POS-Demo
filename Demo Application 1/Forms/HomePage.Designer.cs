@@ -75,6 +75,7 @@
             this.cbxProfile.Name = "cbxProfile";
             this.cbxProfile.Size = new System.Drawing.Size(144, 21);
             this.cbxProfile.TabIndex = 1;
+            this.cbxProfile.SelectedIndexChanged += new System.EventHandler(this.cbxProfile_SelectedIndexChanged);
             // 
             // panel1
             // 

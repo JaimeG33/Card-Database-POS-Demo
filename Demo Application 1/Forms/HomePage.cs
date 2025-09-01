@@ -121,5 +121,10 @@ namespace Demo_Application_1
             this.Hide();
 
         }
+
+        private void cbxProfile_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
