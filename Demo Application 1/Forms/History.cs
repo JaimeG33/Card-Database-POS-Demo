@@ -48,13 +48,19 @@ namespace Demo_Application_1
             dtpEnd.Value = DateTime.Today.AddHours(23).AddMinutes(30); // 11:30 PM
 
             // Setup and fill chart with basic sales data
-            if (chart1.Series.Count == 0)
+            if (chart1.Series.Count < 2)
             {
-                chart1.Series.Add("Profit Over Time");
+                chart1.Series.Add("Individual Sale");
+
+                chart1.Series.Add("Average Profit");
+                    chart1.Series[1].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+                    chart1.Series[1].Color = Color.Red; // Make the average line stand out
+                    chart1.Series[1].BorderWidth = 2;
             }
 
             SetupChart_BasicSalesData();
             FillChart_BasicSalesData();
+            Setup_Chart_Line();
         }
 
 
@@ -136,11 +142,15 @@ namespace Demo_Application_1
         private void dtpStart_ValueChanged(object sender, EventArgs e)
         {
             startDate = dtpStart.Value;
+            selectedTimeFrame = "Custom";
+            HighlightTimeframe();
         }
 
         private void dtpEnd_ValueChanged(object sender, EventArgs e)
         {
             endDate = dtpEnd.Value;
+            selectedTimeFrame = "Custom";
+            HighlightTimeframe();
         }
         //   ----------------------------------------------------------------------  Functions  --------------------------------------------------------------------------------
 
@@ -241,6 +251,7 @@ namespace Demo_Application_1
                 case "Basic Sales Data":
                     // First clear existing points
                     chart1.Series[0].Points.Clear();
+                    chart1.Series[1].Points.Clear();
                     // Then set up the series and title
                     chart1.Series[0].Name = "Profit Over Time";
                     if (chart1.Titles.Count == 0)
@@ -269,16 +280,59 @@ namespace Demo_Application_1
 
         private void FillChart_BasicSalesData()
         {
-            // Add each point from the points list
+            chart1.Series.Clear();
+            // First, ensure two series exist
+            if (chart1.Series.Count < 2)
+            {
+                if (chart1.Series.Count == 0)
+                {
+                    chart1.Series.Add("Individual Sale"); // The points
+                        chart1.Series[0].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+                        chart1.Series[0].Color = Color.Blue;
+                        chart1.Series[0].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+
+                    chart1.Series.Add("Average Revenue"); // The moving average line
+                        chart1.Series[1].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+                        chart1.Series[1].Color = Color.Red;
+                        chart1.Series[1].BorderWidth = 2;
+                }              
+            }
+
+
+            // Plot individual profit points
+            chart1.Series[0].Points.Clear();
             foreach (var pt in points)
             {
                 chart1.Series[0].Points.AddXY(pt.SaleDate.ToOADate(), pt.Profit);
             }
-
-            // Refresh the chart to display the new data
             chart1.Series[0].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+
+            // Plot moving average line
+            chart1.Series[1].Points.Clear();
+            int windowSize = 5; // Adjust for smoothing
+            for (int i = 0; i < points.Count; i++)
+            {
+                int start = Math.Max(0, i - windowSize + 1);
+                int count = i - start + 1;
+                decimal avg = points.Skip(start).Take(count).Average(p => p.Profit);
+                chart1.Series[1].Points.AddXY(points[i].SaleDate.ToOADate(), avg);
+            }
+            chart1.Series[1].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
         }
 
+        private void Setup_Chart_Line()
+        {
+            int windowSize = 5; // Change for smoother/less smooth line
+
+            for (int i = 0; i < points.Count; i++)
+            {
+                int start = Math.Max(0, i - windowSize + 1);
+                int count = i - start + 1;
+                decimal avg = points.Skip(start).Take(count).Average(p => p.Profit);
+                chart1.Series[1].Points.AddXY(points[i].SaleDate.ToOADate(), avg);
+            }
+            chart1.Series[1].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+        }
 
 
 
@@ -288,10 +342,10 @@ namespace Demo_Application_1
         public string basicQuery = @"
     SELECT saleDate, profit
     FROM Sale
-    WHERE saleDate BETWEEN @startDate AND @endDate
+    WHERE saleDate BETWEEN @startDate AND @endDate AND profit > 0
     ORDER BY saleDate ASC;";
 
-        // BETWEEN 'startDate' AND 'endDate'
+        // BETWEEN 'startDate' AND 'endDate' (only include sales that made money for now, not the store buying from customers)
 
         private void SetupChart_BasicSalesData()
         { 
@@ -321,7 +375,7 @@ namespace Demo_Application_1
                             
                         }
                         //Testing
-                        //MessageBox.Show($"Loaded {points.Count} points from DB");
+                        MessageBox.Show($"Loaded {points.Count} points from DB");
                     }
                 }
                 catch (Exception ex)
