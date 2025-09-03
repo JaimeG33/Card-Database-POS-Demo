@@ -75,11 +75,13 @@ namespace Demo_Application_1
         public DateTime endDate;
         public DateTime currentDate = DateTime.Now;
 
-        private List<GraphData1> graphData1 = new List<GraphData1>();
-        public class GraphData1
+        private List<RawData> rawData_TransactionLine = new List<RawData>();
+        public class RawData
         { 
             public DateTime startDateG1 { get; set; }
             public DateTime endDateG1 { get; set; }
+            public int saleId { get; set; }
+            public int transactionId { get; set; }
             public int cardGameId { get; set; }
             public string cardName { get; set; }
             public string rarity { get; set; }
@@ -350,7 +352,10 @@ namespace Demo_Application_1
 
         // BETWEEN 'startDate' AND 'endDate' (only include sales that made money for now, not the store buying from customers)
 
-        private void SetupChart_BasicSalesData()
+
+        // Fills the points (SaleProfitPoint) table
+        // Likely to be used to fill in the chart
+        private void SetupChart_BasicSalesData() 
         { 
             using (SqlConnection conn = new SqlConnection(connString))
             {
@@ -378,7 +383,7 @@ namespace Demo_Application_1
                             
                         }
                         //Testing
-                        MessageBox.Show($"Loaded {points.Count} points from DB");
+                        //MessageBox.Show($"Loaded {points.Count} points from DB");
                     }
                 }
                 catch (Exception ex)
@@ -390,7 +395,65 @@ namespace Demo_Application_1
         }
 
 
+        public string rawDataQuery = @"
+    SELECT saleDate, cardName, rarity, cardGameId, setId, amtTraded, agreedPrice,buyOrSell, Sale.saleId, transactionId, employeeId, register, customerId 
+    FROM TransactionLine INNER JOIN Sale ON TransactionLine.saleId = Sale.saleId 
+    WHERE saleDate BETWEEN @startDate AND @endDate 
+    ORDER BY saleDate ASC;";
+        // saleDate = datetime, cardName = varchar(200), rarity = varchar(50), cardGameId = tinyint, setId = smallint, amtTraded = tinyint, agreedPrice = smallmoney, buyOrSell = bit
+        // saleId = smallint, transactionId = smallint, employeeId = tinyint, register = tinyint, customerId = smallint
+        // Fills the rawData_TransactionLine table
+        // (Lotsa Info) Likely to be used for detailed reports and excel export
+        private void GetRawData()
+        {
+            using (SqlConnection conn = new SqlConnection(connString))
+            {
+                try
+                {
+                    conn.Open();
+                    //enter the query
 
+                    using (SqlCommand cmd = new SqlCommand(rawDataQuery, conn))
+                    {
+                        // Pass C# DateTime values to SQL
+                        cmd.Parameters.AddWithValue("@startDate", startDate);
+                        cmd.Parameters.AddWithValue("@endDate", endDate);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                rawData_TransactionLine.Add(new RawData
+                                {
+                                    startDateG1 = startDate,
+                                    endDateG1 = endDate,
+
+                                    // Query columns (SQL Server to C# data types are an enormous pain in the ass)
+                                    saleId = reader.GetInt16(reader.GetOrdinal("saleId")), // smallint
+                                    transactionId = reader.GetInt16(reader.GetOrdinal("transactionId")), // smallint
+                                    employeeId = reader.GetByte(reader.GetOrdinal("employeeId")), // tinyint
+                                    register = reader.GetByte(reader.GetOrdinal("register")), // tinyint
+                                    customerId = reader.IsDBNull(reader.GetOrdinal("customerId")) ? (short)0 : reader.GetInt16(reader.GetOrdinal("customerId")), // smallint (can be null)
+                                    cardGameId = reader.GetByte(reader.GetOrdinal("cardGameId")), // tinyint
+                                    amtTraded = reader.GetByte(reader.GetOrdinal("amtTraded")), // tinyint
+                                    setId = reader.GetInt16(reader.GetOrdinal("setId")), // smallint
+                                    buyOrSell = reader.GetBoolean(reader.GetOrdinal("buyOrSell")), // bit
+                                    agreedPrice = reader.GetDecimal(reader.GetOrdinal("agreedPrice")), // smallmoney
+                                    cardName = reader.GetString(reader.GetOrdinal("cardName")), // varchar
+                                    rarity = reader.IsDBNull(reader.GetOrdinal("rarity")) ? string.Empty : reader.GetString(reader.GetOrdinal("rarity")), // varchar (can be null)
+                                });
+                            }
+
+                        }
+                        
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error loading inventory: " + ex.Message);
+                }
+            }
+        }
 
         // ------------------------------------------------------------------------------------  Excel Stuff  ----------------------------------------------------------------------------
         // Currently using ClosedXML library due to licensing restrictions (likely will not be able to create graphs within program)
@@ -410,6 +473,8 @@ namespace Demo_Application_1
                 DateTime now = DateTime.Now;
                 excelFileName = string.Format("{0}_{1}",name, now);
                 excelFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), excelFileName + ".xlsx");
+
+                GetRawData(); // Gets the values ready for export in the rawData_TransactionLine List
                 Excel_FileCreation();
             }
             else
