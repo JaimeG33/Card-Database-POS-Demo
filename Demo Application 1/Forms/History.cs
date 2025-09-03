@@ -386,6 +386,21 @@ namespace Demo_Application_1
                 
         }
 
-        
+
+
+
+        // ------------------------------------------------------------------------------------  Excel Stuff  ----------------------------------------------------------------------------
+        public string excelFileName = "SalesData.xlsx";
+        private void btnGenerateExcel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Excel_FileCreation()
+        {
+
+        }
+
+
     }
 }

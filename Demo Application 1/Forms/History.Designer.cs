@@ -56,6 +56,8 @@
             this.dtpStart = new System.Windows.Forms.DateTimePicker();
             this.dtpEnd = new System.Windows.Forms.DateTimePicker();
             this.btnCustom = new System.Windows.Forms.Button();
+            this.flowLayoutPanel4 = new System.Windows.Forms.FlowLayoutPanel();
+            this.btnGenerateExcel = new System.Windows.Forms.Button();
             this.panelTitle.SuspendLayout();
             this.panelBackground.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -68,6 +70,7 @@
             this.flowLayoutPanel3.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
+            this.flowLayoutPanel4.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelTitle
@@ -148,6 +151,7 @@
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 79.71698F));
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20.28302F));
             this.tableLayoutPanel3.Controls.Add(this.tableLayoutPanel4, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this.flowLayoutPanel4, 1, 0);
             this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
@@ -368,6 +372,28 @@
             this.btnCustom.Text = "Custom";
             this.btnCustom.UseVisualStyleBackColor = true;
             // 
+            // flowLayoutPanel4
+            // 
+            this.flowLayoutPanel4.Controls.Add(this.btnGenerateExcel);
+            this.flowLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel4.Location = new System.Drawing.Point(507, 0);
+            this.flowLayoutPanel4.Margin = new System.Windows.Forms.Padding(0);
+            this.flowLayoutPanel4.Name = "flowLayoutPanel4";
+            this.flowLayoutPanel4.Size = new System.Drawing.Size(129, 440);
+            this.flowLayoutPanel4.TabIndex = 3;
+            // 
+            // btnGenerateExcel
+            // 
+            this.btnGenerateExcel.BackColor = System.Drawing.Color.Green;
+            this.btnGenerateExcel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnGenerateExcel.Location = new System.Drawing.Point(3, 3);
+            this.btnGenerateExcel.Name = "btnGenerateExcel";
+            this.btnGenerateExcel.Size = new System.Drawing.Size(126, 53);
+            this.btnGenerateExcel.TabIndex = 0;
+            this.btnGenerateExcel.Text = "Generate Excel File";
+            this.btnGenerateExcel.UseVisualStyleBackColor = false;
+            this.btnGenerateExcel.Click += new System.EventHandler(this.btnGenerateExcel_Click);
+            // 
             // History
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -395,6 +421,7 @@
             this.flowLayoutPanel3.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel1.ResumeLayout(false);
+            this.flowLayoutPanel4.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -426,5 +453,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnCustom;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel4;
+        private System.Windows.Forms.Button btnGenerateExcel;
     }
 }
