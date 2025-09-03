@@ -9,6 +9,7 @@ using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Demo_Application_1
 {
@@ -22,7 +23,7 @@ namespace Demo_Application_1
         {
             changingTabs = false;
 
-            
+
 
             //Form Size
             this.WindowState = FormWindowState.Maximized;
@@ -61,6 +62,8 @@ namespace Demo_Application_1
             SetupChart_BasicSalesData();
             FillChart_BasicSalesData();
             Setup_Chart_Line();
+
+
         }
 
 
@@ -390,14 +393,35 @@ namespace Demo_Application_1
 
 
         // ------------------------------------------------------------------------------------  Excel Stuff  ----------------------------------------------------------------------------
-        public string excelFileName = "SalesData.xlsx";
+        // Currently using ClosedXML library due to licensing restrictions (likely will not be able to create graphs within program)
+        public string excelFileName = string.Format("");
+        public string excelFilePath = string.Format("");
         private void btnGenerateExcel_Click(object sender, EventArgs e)
         {
-
+            DialogResult result = MessageBox.Show
+                ("This will generate an excel file ",
+                    "Confirm or Cancel",
+                    MessageBoxButtons.OKCancel,
+                    MessageBoxIcon.Warning
+                );
+            if (result == DialogResult.OK)
+            {
+                string name = chart1.Text;
+                DateTime now = DateTime.Now;
+                excelFileName = string.Format("{0}_{1}",name, now);
+                excelFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), excelFileName + ".xlsx");
+                Excel_FileCreation();
+            }
+            else
+            {
+                MessageBox.Show("Cancelled");
+            }
         }
 
         private void Excel_FileCreation()
         {
+            MessageBox.Show("Excel file generation not yet implemented.");
+
 
         }
 
