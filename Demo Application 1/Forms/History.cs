@@ -4,12 +4,13 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.IO;
+using static Demo_Application_1.History;
 
 namespace Demo_Application_1
 {
@@ -80,6 +81,7 @@ namespace Demo_Application_1
         { 
             public DateTime startDateG1 { get; set; }
             public DateTime endDateG1 { get; set; }
+            public DateTime saleDate { get; set; }
             public int saleId { get; set; }
             public int transactionId { get; set; }
             public int cardGameId { get; set; }
@@ -429,6 +431,7 @@ namespace Demo_Application_1
                                     endDateG1 = endDate,
 
                                     // Query columns (SQL Server to C# data types are an enormous pain in the ass)
+                                    saleDate = reader.GetDateTime(reader.GetOrdinal("saleDate")),
                                     saleId = reader.GetInt16(reader.GetOrdinal("saleId")), // smallint
                                     transactionId = reader.GetInt16(reader.GetOrdinal("transactionId")), // smallint
                                     employeeId = reader.GetByte(reader.GetOrdinal("employeeId")), // tinyint
@@ -441,11 +444,10 @@ namespace Demo_Application_1
                                     agreedPrice = reader.GetDecimal(reader.GetOrdinal("agreedPrice")), // smallmoney
                                     cardName = reader.GetString(reader.GetOrdinal("cardName")), // varchar
                                     rarity = reader.IsDBNull(reader.GetOrdinal("rarity")) ? string.Empty : reader.GetString(reader.GetOrdinal("rarity")), // varchar (can be null)
+
                                 });
                             }
-
                         }
-                        
                     }
                 }
                 catch (Exception ex)
@@ -471,8 +473,10 @@ namespace Demo_Application_1
             {
                 string name = chart1.Text;
                 DateTime now = DateTime.Now;
-                excelFileName = string.Format("{0}_{1}",name, now);
+                excelFileName = string.Format("{0}_{1:yyyyMMdd_HHmmss}", name, now);
                 excelFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), excelFileName + ".xlsx");
+
+                MessageBox.Show($"Excel file will be created at: {excelFilePath}");
 
                 GetRawData(); // Gets the values ready for export in the rawData_TransactionLine List
                 Excel_FileCreation();
@@ -485,9 +489,84 @@ namespace Demo_Application_1
 
         private void Excel_FileCreation()
         {
-            MessageBox.Show("Excel file generation not yet implemented.");
+            using (var workbook = new ClosedXML.Excel.XLWorkbook())
+            {
+                // Adds the main sheet with the graph
+                var wsMain = workbook.Worksheets.Add("Main Graphic");
+
+                // Headers
+                wsMain.Cell(1, 1).Value = "Sale Date";
+                wsMain.Cell(1, 2).Value = "Profit";
+
+                // Insert data points (from points list)
+                for (int i = 0; i < points.Count; i++)
+                {
+                    wsMain.Cell(i + 2, 1).Value = points[i].SaleDate;
+                    wsMain.Cell(i + 2, 1).Style.DateFormat.Format = "yyyy-mm-dd";
+
+                    wsMain.Cell(i + 2, 2).Value = points[i].Profit;
+                }
+                wsMain.Columns().AdjustToContents();
 
 
+                // Add a new worksheet for raw data
+                var wsRaw = workbook.Worksheets.Add("Raw Data");
+
+                // Headers
+                wsRaw.Cell(1, 1).Value = "Date";
+                wsRaw.Cell(1, 2).Value = "Product Name";
+                wsRaw.Cell(1, 3).Value = "Quantity";
+                wsRaw.Cell(1, 4).Value = "Price";
+                wsRaw.Cell(1, 5).Value = "BuyFrom or SellTo";
+                wsRaw.Cell(1, 6).Value = "Rarity";
+                wsRaw.Cell(1, 7).Value = "Game ID";
+                wsRaw.Cell(1, 8).Value = "Customer";
+                wsRaw.Cell(1, 9).Value = "Set ID";
+                wsRaw.Cell(1, 10).Value = "Sale ID";
+                wsRaw.Cell(1, 11).Value = "Transaction ID";
+                wsRaw.Cell(1, 12).Value = "Employee ID";
+
+
+                string buyOrSellText = "";
+                string cardGameText = "";
+                // Insert raw data
+                for (int i = 0; i < rawData_TransactionLine.Count; i++)
+                {
+                    wsRaw.Cell(i + 2, 1).Value = rawData_TransactionLine[i].saleDate;
+                    wsRaw.Cell(i + 2, 2).Value = rawData_TransactionLine[i].cardName;
+                    wsRaw.Cell(i + 2, 3).Value = rawData_TransactionLine[i].amtTraded;
+                    wsRaw.Cell(i + 2, 4).Value = rawData_TransactionLine[i].agreedPrice;
+                    
+                    buyOrSellText = rawData_TransactionLine[i].buyOrSell ? "Sell" : "Buy";
+                        wsRaw.Cell(i + 2, 5).Value = buyOrSellText;
+                    wsRaw.Cell(i + 2, 6).Value = rawData_TransactionLine[i].rarity;
+                    // Map cardGameId to text
+                    if (rawData_TransactionLine[i].cardGameId == 1)
+                    { 
+                        cardGameText = "Yugioh";
+                    }
+                    else if (rawData_TransactionLine[i].cardGameId == 2)
+                    {
+                        cardGameText = "Magic";
+                    }
+                    else if (rawData_TransactionLine[i].cardGameId == 3)
+                    {
+                        cardGameText = "Pokemon";
+                    }
+                    wsRaw.Cell(i + 2, 7).Value = cardGameText;
+                    wsRaw.Cell(i + 2, 8).Value = rawData_TransactionLine[i].customerId;
+                    wsRaw.Cell(i + 2, 9).Value = rawData_TransactionLine[i].setId;
+                    wsRaw.Cell(i + 2, 10).Value = rawData_TransactionLine[i].saleId;
+                    wsRaw.Cell(i + 2, 11).Value = rawData_TransactionLine[i].transactionId;
+                    wsRaw.Cell(i + 2, 12).Value = rawData_TransactionLine[i].employeeId;
+                }
+                wsRaw.Columns().AdjustToContents();
+
+                // Save the workbook
+                workbook.SaveAs(excelFilePath);
+            }
+
+            Console.WriteLine($"Excel file created at: {excelFilePath}");
         }
 
 
