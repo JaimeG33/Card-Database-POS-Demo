@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -25,7 +26,6 @@ namespace Demo_Application_1
             changingTabs = false;
 
 
-
             //Form Size
             this.WindowState = FormWindowState.Maximized;
 
@@ -42,14 +42,17 @@ namespace Demo_Application_1
             dtpEnd.Font = bigFont;
             endDate = dtpEnd.Value;
 
-            HighlightTimeframe();
-            UpdateChart_xAxis();
-
             // Set default times
             dtpStart.Value = DateTime.Today.AddHours(14);      // 2:00 PM
             dtpEnd.Value = DateTime.Today.AddHours(23).AddMinutes(30); // 11:30 PM
 
+            HighlightTimeframe();
+            UpdateChart_xAxis();
+
             // Setup and fill chart with basic sales data
+
+
+            chart1.Series[0].Name = "Profit Over Time";
             if (chart1.Series.Count < 2)
             {
                 chart1.Series.Add("Individual Sale");
@@ -64,13 +67,15 @@ namespace Demo_Application_1
             FillChart_BasicSalesData();
             Setup_Chart_Line();
 
-
+            // Do the same for the recent sales datagridview
+            RecentSales();
+            AdjustDGV();
         }
 
 
         //    ---------------------------------------------------  Important Variables  -------------------------------------------------------------------------------
 
-        public string selectedTimeFrame = "Custom"; // Default Time Frame is today from 2:00PM to 11:30PM
+        public string selectedTimeFrame = "Today"; // Default Time Frame is today from 2:00PM to 11:30PM
 
         public DateTime startDate;
         public DateTime endDate;
@@ -102,6 +107,14 @@ namespace Demo_Application_1
             public decimal Profit { get; set; }
         }
         List<SaleProfitPoint> points = new List<SaleProfitPoint>();
+
+        public class SimplifiedViewingPoints
+        {
+            public DateTime dateTime { get; set; }
+            public decimal profit { get; set; }
+            public string info { get; set; }
+        }
+        List<SimplifiedViewingPoints> pointsByDate = new List<SimplifiedViewingPoints>();
 
 
         //Stuff to accept a reference to the HomePage (Different from the other tabs)
@@ -139,7 +152,14 @@ namespace Demo_Application_1
             
         }
 
-     
+        private void AdjustDGV()
+        {
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            //dataGridView1.Dock = DockStyle.Fill;
+        }
+
+
 
         private void label2_Click(object sender, EventArgs e)
         {
@@ -148,6 +168,7 @@ namespace Demo_Application_1
         
         private void dtpStart_ValueChanged(object sender, EventArgs e)
         {
+            useSalesAsPoints = false;
             startDate = dtpStart.Value;
             selectedTimeFrame = "Custom";
             HighlightTimeframe();
@@ -155,6 +176,7 @@ namespace Demo_Application_1
 
         private void dtpEnd_ValueChanged(object sender, EventArgs e)
         {
+            useSalesAsPoints = false;
             endDate = dtpEnd.Value;
             selectedTimeFrame = "Custom";
             HighlightTimeframe();
@@ -211,22 +233,27 @@ namespace Demo_Application_1
         }
         private void btnToday_Click(object sender, EventArgs e)
         {
+            useSalesAsPoints = true;
             ResetStardEndDates();
             startDate = startDate.AddHours(14);      // 2:00 PM
-            endDate = DateTime.Now; // Current Time
+            endDate = endDate.AddHours(23).AddMinutes(30);         // 11:30 PM
 
             if (startDate > endDate)
             {
-                startDate = endDate.AddHours(-8); // Ensure end date is after start date
+                startDate = endDate.AddHours(-4); // Ensure end date is after start date
             }
             UpdateDatePickers();
             selectedTimeFrame = "Today";
             HighlightTimeframe();
             UpdateChart_xAxis();
+
+            basicSalesData();
         }
 
         private void btnWeek_Click(object sender, EventArgs e)
         {
+            useSalesAsPoints = false;
+            numberOfPointsOnChart = 7;
             ResetStardEndDates();
             startDate = startDate.AddDays(-7).AddHours(14);      // 2:00 PM, 7 days ago
             endDate = DateTime.Today.AddHours(23).AddMinutes(30); // 11:30 PM, Today
@@ -238,6 +265,8 @@ namespace Demo_Application_1
 
         private void btnMonth_Click(object sender, EventArgs e)
         {
+            useSalesAsPoints = false;
+            numberOfPointsOnChart = 30;
             ResetStardEndDates();
             startDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddHours(14); // 2:00 PM, starting on the 1st day of the month
             endDate = DateTime.Today.AddHours(23).AddMinutes(30); // 11:30 PM, Today
@@ -251,6 +280,9 @@ namespace Demo_Application_1
 
 
         // ----------------------------------------------------------  Charts and Info  ----------------------------------------------------------------------------------
+
+        public int numberOfPointsOnChart = 7;
+        public bool useSalesAsPoints = true; // If false, use the numberOfPointsOnChart to determine the amount of points on grahph
         private void cbChart_SelectedIndexChanged(object sender, EventArgs e)
         {
             switch(cbChart.Text)
@@ -270,13 +302,67 @@ namespace Demo_Application_1
                         chart1.Titles[0].Text = "Profit Over Time";
                     }
                     points.Clear();
+                    UpdateChart_xAxis();
                     SetupChart_BasicSalesData();
                     FillChart_BasicSalesData();
-                    UpdateChart_xAxis();
+
+                    break;
+
+                case "Today":
+                    btnToday.PerformClick();
                     break;
             }
         }
+        // This fills the pointsByDate list with condensed points (1 point per day) for easier viewing (compared to the old method of using every sale as a point)
+        private void SortPointsByDay()
+        {
+            pointsByDate.Clear();
 
+            // Group points by date, sum profits for each day
+            var grouped = points
+                .GroupBy(p => p.SaleDate.Date)
+                .OrderBy(g => g.Key)
+                .ToList();
+
+            // Determine the date range (last 'days' days)
+            DateTime start = endDate.Date.AddDays(-numberOfPointsOnChart + 1);
+            for (int i = 0; i < numberOfPointsOnChart; i++)
+            {
+                DateTime day = start.AddDays(i);
+                var group = grouped.FirstOrDefault(g => g.Key == day);
+                decimal totalProfit = group != null ? group.Sum(x => x.Profit) : 0m;
+
+                pointsByDate.Add(new SimplifiedViewingPoints
+                {
+                    dateTime = day,
+                    profit = totalProfit,
+                    info = day.ToString("MM/dd")
+                });
+            }
+        }
+
+        // This fills the chart with 1 point for every sale that made a profit (no condensed points for easier viewing)
+        private void basicSalesData()
+        {
+            cbChart.Text = "Basic Sales Data";
+            // First clear existing points
+            chart1.Series[0].Points.Clear();
+            chart1.Series[1].Points.Clear();
+            // Then set up the series and title
+            chart1.Series[0].Name = "Profit Over Time";
+            if (chart1.Titles.Count == 0)
+            {
+                chart1.Titles.Add("Profit Over Time");
+            }
+            else
+            {
+                chart1.Titles[0].Text = "Profit Over Time";
+            }
+            points.Clear();
+            UpdateChart_xAxis();
+            SetupChart_BasicSalesData();
+            FillChart_BasicSalesData();
+        }
         private void UpdateChart_xAxis()
         {
             // After you set or update your chart data (e.g., after UpdateDatePickers or when refreshing the chart)
@@ -305,14 +391,24 @@ namespace Demo_Application_1
                 }              
             }
 
-
             // Plot individual profit points
-            chart1.Series[0].Points.Clear();
-            foreach (var pt in points)
+            if (useSalesAsPoints == true) // Best for time frames of around 1 day
             {
-                chart1.Series[0].Points.AddXY(pt.SaleDate.ToOADate(), pt.Profit);
+                chart1.Series[0].Points.Clear();
+                foreach (var pt in points)
+                {
+                    chart1.Series[0].Points.AddXY(pt.SaleDate.ToOADate(), pt.Profit);
+                }
+                chart1.Series[0].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
             }
-            chart1.Series[0].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            else // Best for time frames of around 1 week or more
+            {
+                chart1.Series[0].Points.Clear();
+                foreach (var pt in pointsByDate)
+                {
+                    chart1.Series[0].Points.AddXY(pt.dateTime.ToOADate(), pt.profit);
+                }
+            }
 
             // Plot moving average line
             chart1.Series[1].Points.Clear();
@@ -343,7 +439,6 @@ namespace Demo_Application_1
 
 
 
-
         // ------------------------------------------------------------------  SQL Stuff  -----------------------------------------------------------------------------------------
         // This one only shows basic info for now (profit and time)
         public string basicQuery = @"
@@ -353,9 +448,9 @@ namespace Demo_Application_1
     ORDER BY saleDate ASC;";
 
         // BETWEEN 'startDate' AND 'endDate' (only include sales that made money for now, not the store buying from customers)
+        
 
-
-        // Fills the points (SaleProfitPoint) table
+        // Fills the points (SaleProfitPoint) and pointsByDate lists 
         // Likely to be used to fill in the chart
         private void SetupChart_BasicSalesData() 
         { 
@@ -374,6 +469,7 @@ namespace Demo_Application_1
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
+                            // Fill the points list with the result from the query
                             while (reader.Read())
                             {
                                 points.Add(new SaleProfitPoint
@@ -384,8 +480,8 @@ namespace Demo_Application_1
                             }
                             
                         }
-                        //Testing
-                        //MessageBox.Show($"Loaded {points.Count} points from DB");
+                        //Then sort the points by day for easier viewing (Stored in the pointsByDate list)
+                        SortPointsByDay();
                     }
                 }
                 catch (Exception ex)
@@ -456,7 +552,52 @@ namespace Demo_Application_1
                 }
             }
         }
+        public int lastX = 0;
 
+        public string recentSalesQuery = @"
+SELECT 
+    S.saleDate,
+    T.cardName,
+    T.rarity,
+    T.agreedPrice,
+    T.amtTraded,
+    (T.agreedPrice * T.amtTraded) AS total
+FROM Sale AS S
+INNER JOIN TransactionLine AS T
+    ON S.saleId = T.saleId
+ORDER BY S.saleDate DESC
+OFFSET @Offset ROWS FETCH NEXT 50 ROWS ONLY;";
+
+        private void RecentSales()
+        {
+            using (SqlConnection conn = new SqlConnection(connString))
+            {
+                try
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand(recentSalesQuery, conn))
+                    {
+                        // Add the OFFSET parameter (from lastX)
+                        cmd.Parameters.AddWithValue("@Offset", lastX);
+
+                        // Execute the command
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            DataTable dataTable = new DataTable();
+                            dataTable.Load(reader);
+
+                            // Bind to DataGridView
+                            dataGridView1.DataSource = dataTable;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error loading recent sales:\n" + ex.Message);
+                }
+            }
+        }
         // ------------------------------------------------------------------------------------  Excel Stuff  ----------------------------------------------------------------------------
         // Currently using ClosedXML library due to licensing restrictions (likely will not be able to create graphs within program)
         public string excelFileName = string.Format("");
@@ -540,7 +681,7 @@ namespace Demo_Application_1
                     buyOrSellText = rawData_TransactionLine[i].buyOrSell ? "Sell" : "Buy";
                         wsRaw.Cell(i + 2, 5).Value = buyOrSellText;
                     wsRaw.Cell(i + 2, 6).Value = rawData_TransactionLine[i].rarity;
-                    // Map cardGameId to text
+                    
                     if (rawData_TransactionLine[i].cardGameId == 1)
                     { 
                         cardGameText = "Yugioh";

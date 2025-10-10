@@ -57,9 +57,9 @@ namespace Demo_Application_1
             {
                 // Builds connection string using the user's input
                 string serverIP = Properties.Settings.Default.ServerIp;
-                connectionString = string.Format("Server={2}\\SQLEXPRESS;Database=Revised Demo Database CAv2;User Id={0};Password={1};", username, password, serverIP);
+                connectionString = string.Format("Server={2},1433;Database=Revised Demo Database CAv2;User Id={0};Password={1};", username, password, serverIP);
                 //Connection String Explained
-                //Server = MainComputer (//usingSQLExpress)
+                //Server = MainComputer (IPv4 Address),1433 (default port for SQL)
                 //Database = whichever one you are connected to (Revised Demo Database CAv2)
                 //Username = SellerTest, Password = Test_123
                 //IMPORTANT: In SQL Configuration Manager, (SQL Services) -> (SQL Server Browsing) must be turned on
@@ -111,6 +111,13 @@ namespace Demo_Application_1
             string username = tbUser.Text.Trim();
             string password = tbPswd.Text.Trim();
 
+            // This is to bypass login for testing purposes only
+            //username = "SellerTest";
+            //password = "Test_123";
+
+            //MessageBox.Show($"Attempting to connect as {username}");
+            //MessageBox.Show($"Entered password: {password}");
+           // MessageBox.Show($"Using server IP: {Properties.Settings.Default.ServerIp}");
 
             DatabaseManager dbManager = new DatabaseManager();
             //if TryConnect method is successfull...
