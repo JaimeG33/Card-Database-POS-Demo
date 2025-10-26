@@ -379,30 +379,28 @@ namespace Demo_Application_1
             {
                 if (chart1.Series.Count == 0)
                 {
-                    chart1.Series.Add("Individual Sale"); // The points
-                        chart1.Series[0].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-                        chart1.Series[0].Color = Color.Blue;
-                        chart1.Series[0].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
-
-                    chart1.Series.Add("Average Revenue"); // The moving average line
-                        chart1.Series[1].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-                        chart1.Series[1].Color = Color.Red;
-                        chart1.Series[1].BorderWidth = 2;
-                }              
+                    chart1.Series.Add("Individual Sale");
+                    chart1.Series.Add("Average Revenue");
+                }
             }
 
-            // Plot individual profit points
-            if (useSalesAsPoints == true) // Best for time frames of around 1 day
+            // Set chart type based on useSalesAsPoints
+            if (useSalesAsPoints)
             {
+                chart1.Series[0].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+                chart1.Series[0].Color = Color.Blue;
+                chart1.Series[0].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
                 chart1.Series[0].Points.Clear();
                 foreach (var pt in points)
                 {
                     chart1.Series[0].Points.AddXY(pt.SaleDate.ToOADate(), pt.Profit);
                 }
-                chart1.Series[0].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
             }
-            else // Best for time frames of around 1 week or more
+            else
             {
+                chart1.Series[0].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Column;
+                chart1.Series[0].Color = Color.SteelBlue;
+                chart1.Series[0].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
                 chart1.Series[0].Points.Clear();
                 foreach (var pt in pointsByDate)
                 {
@@ -410,7 +408,7 @@ namespace Demo_Application_1
                 }
             }
 
-            // Plot moving average line
+            // Plot moving average line (optional, only for dot chart)
             chart1.Series[1].Points.Clear();
             int windowSize = 5; // Adjust for smoothing
             for (int i = 0; i < points.Count; i++)
@@ -420,6 +418,9 @@ namespace Demo_Application_1
                 decimal avg = points.Skip(start).Take(count).Average(p => p.Profit);
                 chart1.Series[1].Points.AddXY(points[i].SaleDate.ToOADate(), avg);
             }
+            chart1.Series[1].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            chart1.Series[1].Color = Color.Red;
+            chart1.Series[1].BorderWidth = 2;
             chart1.Series[1].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
         }
 
@@ -710,6 +711,9 @@ OFFSET @Offset ROWS FETCH NEXT 50 ROWS ONLY;";
             Console.WriteLine($"Excel file created at: {excelFilePath}");
         }
 
+        private void chart1_Click(object sender, EventArgs e)
+        {
 
+        }
     }
 }
