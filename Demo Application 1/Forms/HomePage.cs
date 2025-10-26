@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Demo_Application_1.Forms;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -121,10 +122,19 @@ namespace Demo_Application_1
             this.Hide();
 
         }
+        private void invMgmt_Click(object sender, EventArgs e)
+        {
+            // Open Inventory Management tab
+            Form inventory = new Inventory(connString, this);
+            inventory.Show();
+            this.Hide();
+        }
 
         private void cbxProfile_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
+
+        
     }
 }

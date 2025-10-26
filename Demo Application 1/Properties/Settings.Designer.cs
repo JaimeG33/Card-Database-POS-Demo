@@ -34,5 +34,16 @@ namespace Demo_Application_1.Properties {
                 this["ServerIp"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=DESKTOP-JJBM91L\\SQLEXPRESS;Initial Catalog=\"Revised Demo Database CAv" +
+            "2\";Integrated Security=True;Encrypt=True;TrustServerCertificate=True")]
+        public string Revised_Demo_Database_CAv2ConnectionString {
+            get {
+                return ((string)(this["Revised_Demo_Database_CAv2ConnectionString"]));
+            }
+        }
     }
 }
