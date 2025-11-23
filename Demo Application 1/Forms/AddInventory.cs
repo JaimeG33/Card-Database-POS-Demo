@@ -178,16 +178,8 @@ namespace Demo_Application_1.Forms
                 }
             }
         }
-        // Method to generate SQL query for inserting a new set into YugiohSet table
-        // Note that the set must be added before the individual cards
-        // Add more options to fill out the rest of the info later
-        public string addNewSetQuery()
-        {
-            string setQuery = $@"
-                INSERT INTO YugiohSet (groupId, name)
-                VALUES ({selectedSetId}, '{selectedSetName}');";
-            return setQuery;
-        }
+
+
 
         // Method to convert the DataGridView data into SQL queries for database insertion
         private void ConvertDataGridViewToSqlQuery()
@@ -195,23 +187,37 @@ namespace Demo_Application_1.Forms
             string setTableName = selectedTableName + "Set";
             string inventoryTableName = selectedTableName + "Inventory";
 
-            // Convert DataGridView rows into SQL queries
             if (dataGridView1.DataSource is List<YourDataClass> records && records.Count > 0)
             {
-                // Insert the set info first
-                string setQuery = $@"
-                    INSERT INTO [{setTableName}] (setId, cardGameId, setName)
-                    VALUES (@setId, @cardGameId, @setName);";
-
+                bool setExists = false;
+                // Check if setId already exists in the Set table
+                string checkSetQuery = $@"SELECT COUNT(*) FROM [{setTableName}] WHERE setId = @setId";
                 using (SqlConnection connection = new SqlConnection(connString))
-                using (SqlCommand cmd = new SqlCommand(setQuery, connection))
+                using (SqlCommand cmd = new SqlCommand(checkSetQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@setId", selectedSetId);
-                    cmd.Parameters.AddWithValue("@cardGameId", selectedCardGameId);
-                    cmd.Parameters.AddWithValue("@setName", selectedSetName);
-
                     connection.Open();
-                    cmd.ExecuteNonQuery();
+                    int count = (int)cmd.ExecuteScalar();
+                    setExists = count > 0;
+                }
+
+                // Insert the set info only if it doesn't exist
+                if (!setExists)
+                {
+                    string setQuery = $@"
+                        INSERT INTO [{setTableName}] (setId, cardGameId, setName)
+                        VALUES (@setId, @cardGameId, @setName);";
+
+                    using (SqlConnection connection = new SqlConnection(connString))
+                    using (SqlCommand cmd = new SqlCommand(setQuery, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@setId", selectedSetId);
+                        cmd.Parameters.AddWithValue("@cardGameId", selectedCardGameId);
+                        cmd.Parameters.AddWithValue("@setName", selectedSetName);
+
+                        connection.Open();
+                        cmd.ExecuteNonQuery();
+                    }
                 }
 
                 // Insert each inventory record
@@ -224,17 +230,60 @@ namespace Demo_Application_1.Forms
                     connection.Open();
                     foreach (var card in records)
                     {
+                        // Sanitize and parse market price
+                        decimal safeMktPrice = 0m;
+                        if (card.mktPrice.HasValue)
+                        {
+                            safeMktPrice = card.mktPrice.Value;
+                        }
+
+                        // Determine conditionId based on selectedTableName and subTypeName
+                        int conditionId = 0;
+                        string subType = card.subTypeName?.Trim() ?? "";
+
+                        if (selectedTableName.Equals("Yugioh", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (subType.Equals("Normal", StringComparison.OrdinalIgnoreCase))
+                                conditionId = 10;
+                            else if (subType.StartsWith("1", StringComparison.OrdinalIgnoreCase) ||
+                                     subType.StartsWith("F", StringComparison.OrdinalIgnoreCase) ||
+                                     subType.StartsWith("1st", StringComparison.OrdinalIgnoreCase))
+                                conditionId = 1;
+                            else
+                                conditionId = 0;
+                        }
+                        else if (selectedTableName.Equals("Magic", StringComparison.OrdinalIgnoreCase))
+                        {
+                            conditionId = 10; // default
+                            if (subType.Equals("Normal", StringComparison.OrdinalIgnoreCase))
+                                conditionId = 0;
+                            else if (subType.Equals("Foil", StringComparison.OrdinalIgnoreCase))
+                                conditionId = 1;
+                        }
+                        else if (selectedTableName.Equals("Pokemon", StringComparison.OrdinalIgnoreCase))
+                        {
+                            conditionId = 10; // default
+                            if (subType.Equals("Normal", StringComparison.OrdinalIgnoreCase))
+                                conditionId = 0;
+                            else if (subType.Equals("Foil", StringComparison.OrdinalIgnoreCase))
+                                conditionId = 1;
+                            else if (subType.Equals("Holofoil", StringComparison.OrdinalIgnoreCase))
+                                conditionId = 2;
+                            else if (subType.Equals("Reverse Holofoil", StringComparison.OrdinalIgnoreCase))
+                                conditionId = 3;
+                        }
+
                         using (SqlCommand cmd = new SqlCommand(inventoryQuery, connection))
                         {
                             cmd.Parameters.AddWithValue("@cardId", card.cardId);
-                            cmd.Parameters.AddWithValue("@conditionId", 1); // Default conditionId
+                            cmd.Parameters.AddWithValue("@conditionId", conditionId); // <-- Use calculated value
                             cmd.Parameters.AddWithValue("@setId", card.setId);
-                            cmd.Parameters.AddWithValue("@cardGameId", selectedCardGameId);
+                            cmd.Parameters.AddWithValue("@cardGameId", selectedCardGameId); // <-- Use user selection
                             cmd.Parameters.AddWithValue("@cardName", card.cardName);
                             cmd.Parameters.AddWithValue("@rarity", card.rarity ?? (object)DBNull.Value);
                             cmd.Parameters.AddWithValue("@imageURL", card.imageUrl ?? (object)DBNull.Value);
                             cmd.Parameters.AddWithValue("@mktPriceURL", card.mktPriceUrl ?? (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@mktPrice", card.mktPrice);
+                            cmd.Parameters.AddWithValue("@mktPrice", safeMktPrice);
                             cmd.Parameters.AddWithValue("@amtInStock", card.amtInStock);
 
                             cmd.ExecuteNonQuery();
@@ -275,9 +324,10 @@ namespace Demo_Application_1.Forms
             public string rarity { get; set; } // Maps to "rarity"
             public string imageUrl { get; set; } // Maps to "imageUrl"
             public string mktPriceUrl { get; set; } // Maps to "mktPriceURL"
-            public decimal mktPrice { get; set; } // Maps to "mktPrice"
+            public decimal? mktPrice { get; set; } // <-- Make this nullable
             public int amtInStock { get; set; } // New column "amtInStock"
             public string priceUp2Date { get; set; } // New column "priceUp2Date"
+            public string subTypeName { get; set; } // <-- Add this property
         }
 
         // CsvHelper ClassMap for mapping the CSV headers to YourDataClass properties
@@ -292,7 +342,8 @@ namespace Demo_Application_1.Forms
                 Map(m => m.rarity).Name("extRarity"); // Matches CSV header
                 Map(m => m.imageUrl).Name("imageUrl"); // Matches CSV header
                 Map(m => m.mktPriceUrl).Name("url"); // Matches CSV header
-                Map(m => m.mktPrice).Name("marketPrice"); // Matches CSV header
+                Map(m => m.mktPrice).Name("marketPrice").TypeConverterOption.NullValues(string.Empty); // <-- Allow empty string as null
+                Map(m => m.subTypeName).Name("subTypeName"); // <-- Map this column
 
                 // Remove these mappings if the CSV doesn't contain corresponding headers
                 // or add the headers `amtInStock` and `priceUp2Date` to the CSV
