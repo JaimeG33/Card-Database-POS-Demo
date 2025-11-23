@@ -135,6 +135,12 @@ namespace Demo_Application_1
 
         }
 
-        
+        private void addInventory_Click(object sender, EventArgs e)
+        {
+            //Open AddInventory tab
+            Form addInv = new AddInventory(connString, this);
+            addInv.Show();
+            this.Hide();
+        }
     }
 }

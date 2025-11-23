@@ -47,7 +47,7 @@
             this.panel5 = new System.Windows.Forms.Panel();
             this.btnResetIp = new System.Windows.Forms.Button();
             this.btnResetDate = new System.Windows.Forms.Button();
-            this.button7 = new System.Windows.Forms.Button();
+            this.addInventory = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
@@ -247,7 +247,7 @@
             this.panel5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.panel5.Controls.Add(this.btnResetIp);
             this.panel5.Controls.Add(this.btnResetDate);
-            this.panel5.Controls.Add(this.button7);
+            this.panel5.Controls.Add(this.addInventory);
             this.panel5.Controls.Add(this.button6);
             this.panel5.Controls.Add(this.label4);
             this.panel5.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -282,15 +282,18 @@
             this.btnResetDate.UseVisualStyleBackColor = false;
             this.btnResetDate.Click += new System.EventHandler(this.btnResetDate_Click);
             // 
-            // button7
+            // addInventory
             // 
-            this.button7.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button7.Location = new System.Drawing.Point(215, 66);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(132, 31);
-            this.button7.TabIndex = 6;
-            this.button7.Text = "Reports";
-            this.button7.UseVisualStyleBackColor = true;
+            this.addInventory.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.addInventory.BackColor = System.Drawing.Color.Silver;
+            this.addInventory.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.addInventory.Location = new System.Drawing.Point(215, 66);
+            this.addInventory.Name = "addInventory";
+            this.addInventory.Size = new System.Drawing.Size(132, 31);
+            this.addInventory.TabIndex = 6;
+            this.addInventory.Text = "Add New Inventory";
+            this.addInventory.UseVisualStyleBackColor = false;
+            this.addInventory.Click += new System.EventHandler(this.addInventory_Click);
             // 
             // button6
             // 
@@ -359,7 +362,7 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button btnBuySell;
         private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.Button addInventory;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Panel panel6;
         private System.Windows.Forms.Button btnResetDate;

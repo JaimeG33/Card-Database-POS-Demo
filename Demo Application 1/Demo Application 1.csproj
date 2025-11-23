@@ -15,7 +15,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>C:\Users\Jaime\Downloads\Demo Database 0.04.1\</PublishUrl>
+    <PublishUrl>C:\Users\Jaime\Downloads\Final Demo POS\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -69,6 +69,9 @@
     </Reference>
     <Reference Include="ClosedXML.Parser, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1d5f7376574c51ec, processorArchitecture=MSIL">
       <HintPath>..\packages\ClosedXML.Parser.2.0.0\lib\netstandard2.0\ClosedXML.Parser.dll</HintPath>
+    </Reference>
+    <Reference Include="CsvHelper, Version=33.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsvHelper.33.1.0\lib\net47\CsvHelper.dll</HintPath>
     </Reference>
     <Reference Include="DocumentFormat.OpenXml, Version=3.1.1.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
       <HintPath>..\packages\DocumentFormat.OpenXml.3.1.1\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
@@ -157,6 +160,18 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\AddInventory.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AddInventory.Designer.cs">
+      <DependentUpon>AddInventory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\BulkInvEntry.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\BulkInvEntry.Designer.cs">
+      <DependentUpon>BulkInvEntry.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\BuySell.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -195,6 +210,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Revised_Demo_Database_CAv2DataSet.xsd</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Forms\AddInventory.resx">
+      <DependentUpon>AddInventory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\BulkInvEntry.resx">
+      <DependentUpon>BulkInvEntry.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\BuySell.resx">
       <DependentUpon>BuySell.cs</DependentUpon>
     </EmbeddedResource>
