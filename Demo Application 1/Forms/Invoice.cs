@@ -48,6 +48,8 @@ namespace Demo_Application_1.Forms
             // Maximize the form when it loads
             this.WindowState = FormWindowState.Maximized;
             LoadInvoices(); // Load invoices into the data grid view so the user can view existing invoices
+            // Ensure the user cannot edit the DataGridView directly
+            dgvInvoices.ReadOnly = true;
         }
 
         // Important variables
@@ -116,6 +118,32 @@ namespace Demo_Application_1.Forms
 
                 // Highlight the selected row
                 row.Selected = true;
+
+                // Display itemName in lblSelectedItem
+                lblSelectedItem.Text = itemName ?? "";
+
+                // Display image in pictureBoxItem
+                if (pictureBoxItem != null)
+                {
+                    if (!string.IsNullOrEmpty(imageURL))
+                    {
+                        try
+                        {
+                            pictureBoxItem.Load(imageURL);
+                        }
+                        catch
+                        {
+                            pictureBoxItem.Image = null; // Clear if load fails
+                        }
+                    }
+                    else
+                    {
+                        pictureBoxItem.Image = null;
+                    }
+                }
+
+                // Make btnSeeSales visible
+                btnSeeSales.Visible = true;
             }
         }
         // Different row select method for finding SetId
@@ -224,9 +252,9 @@ namespace Demo_Application_1.Forms
             }
             else
             {
-               MessageBox.Show("Please select a card game before searching for a set.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Please select a card game before searching for a set.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-                
+
         }
 
         // Step 1: After finding the set, store the card game ID and show the next step panel
@@ -251,8 +279,8 @@ namespace Demo_Application_1.Forms
                 return;
             }
 
-                // Make the next step panel visible
-                flpAddStep2.Visible = true; // Assumes you have a FlowLayoutPanel named flpAddStep2
+            // Make the next step panel visible
+            flpAddStep2.Visible = true; // Assumes you have a FlowLayoutPanel named flpAddStep2
         }
         private void btnStep2_Click(object sender, EventArgs e)
         {
@@ -261,7 +289,7 @@ namespace Demo_Application_1.Forms
                 CreateNewInvoice1();
             }
             else
-            {   
+            {
                 MessageBox.Show("Please select a set before proceeding.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
@@ -468,18 +496,21 @@ namespace Demo_Application_1.Forms
 
         private void dgvInvoices_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            // Behavior changes depending on what is displayed
             if (dataGridViewMode == "Full Invoices")
             {
-                SelectedRow(); // Fill in all invoice variables
+                SelectedRow();
             }
             else if (dataGridViewMode == "Set Results")
             {
-                SelectedSetRow(); // Fill in setId variable
+                SelectedSetRow();
             }
             else if (dataGridViewMode == "Item Results")
             {
-                SelectedItemRow();// Fill in item variables
+                SelectedItemRow();
+            }
+            else if (dataGridViewMode == "Compare Sales")
+            {
+                SelectedCompareSalesRow();
             }
             // Add more modes as needed
         }
@@ -693,5 +724,186 @@ namespace Demo_Application_1.Forms
                 MessageBox.Show("Error creating invoice: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void btnSeeSales_Click(object sender, EventArgs e)
+        {
+            if (invId <= 0 || cardId <= 0 || cardGameId <= 0)
+            {
+                MessageBox.Show("Please select a valid invoice row first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            dataGridViewMode = "Compare Sales";
+
+            string query = @"
+SELECT 
+    tl.transactionId,
+    tl.saleId,
+    tl.cardGameId,
+    tl.cardId,
+    tl.conditionId,
+    tl.cardName,
+    tl.setId,
+    tl.rarity,
+    tl.timeMktPrice,
+    tl.agreedPrice,
+    tl.amtTraded,
+    tl.buyOrSell,
+    s.saleDate
+FROM 
+    TransactionLine tl
+JOIN 
+    Sale s 
+ON 
+    tl.saleId = s.saleId
+WHERE 
+    tl.cardId = @cardId
+    AND tl.conditionId = @conditionId
+    AND tl.cardGameId = @cardGameId
+    AND tl.amtTraded > 0
+    AND tl.buyOrSell = 1";
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connString))
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@cardId", cardId);
+                        command.Parameters.AddWithValue("@conditionId", 1); // Use actual conditionId if available
+                        command.Parameters.AddWithValue("@cardGameId", cardGameId);
+
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        {
+                            DataTable dt = new DataTable();
+                            adapter.Fill(dt);
+
+                            // Build combined DataTable
+                            DataTable combined = new DataTable();
+
+                            // Add columns for display (match Compare Sales query)
+                            combined.Columns.Add("saleId");
+                            combined.Columns.Add("cardGameId");
+                            combined.Columns.Add("cardId");
+                            combined.Columns.Add("cardName");
+                            combined.Columns.Add("setId");
+                            combined.Columns.Add("timeMktPrice");
+                            combined.Columns.Add("agreedPrice");
+                            combined.Columns.Add("amtTraded");
+                            combined.Columns.Add("saleDate");
+                            combined.Columns.Add("costIndv"); // From invoice
+                            combined.Columns.Add("imageURL"); // From invoice
+
+                            // Add invoice row as first row
+                            DataRow invoiceRow = combined.NewRow();
+                            invoiceRow["saleId"] = ""; // Not applicable for invoice
+                            invoiceRow["cardGameId"] = cardGameId;
+                            invoiceRow["cardId"] = cardId;
+                            invoiceRow["cardName"] = itemName;
+                            invoiceRow["setId"] = setId;
+                            invoiceRow["timeMktPrice"] = ""; // Not applicable for invoice
+                            invoiceRow["agreedPrice"] = ""; // Not applicable for invoice
+                            invoiceRow["amtTraded"] = qty;
+                            invoiceRow["saleDate"] = date != default(DateTime) ? date.ToString() : "";
+                            invoiceRow["costIndv"] = costIndv;
+                            invoiceRow["imageURL"] = imageURL;
+                            combined.Rows.Add(invoiceRow);
+
+                            // Add blank row
+                            combined.Rows.Add(combined.NewRow());
+
+                            // Add sales comparison rows
+                            foreach (DataRow dr in dt.Rows)
+                            {
+                                DataRow newRow = combined.NewRow();
+                                newRow["saleId"] = dr["saleId"];
+                                newRow["cardGameId"] = dr["cardGameId"];
+                                newRow["cardId"] = dr["cardId"];
+                                newRow["cardName"] = dr["cardName"];
+                                newRow["setId"] = dr["setId"];
+                                newRow["timeMktPrice"] = dr["timeMktPrice"];
+                                newRow["agreedPrice"] = dr["agreedPrice"];
+                                newRow["amtTraded"] = dr["amtTraded"];
+                                newRow["saleDate"] = dr["saleDate"];
+                                // For profit/imageURL, keep backend data
+                                newRow["costIndv"] = costIndv;
+                                newRow["imageURL"] = imageURL;
+                                combined.Rows.Add(newRow);
+                            }
+
+                            dgvInvoices.DataSource = combined;
+                            dgvInvoices.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                            dgvInvoices.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+
+                            // Hide unwanted columns
+                            dgvInvoices.Columns["imageURL"].Visible = false;
+                            dgvInvoices.Columns.Add("Profit", "Profit"); // Add profit column for display
+
+                            // Rename headers for clarity
+                            dgvInvoices.Columns["saleId"].HeaderText = "Sale ID";
+                            dgvInvoices.Columns["cardGameId"].HeaderText = "Game";
+                            dgvInvoices.Columns["cardId"].HeaderText = "Card ID";
+                            dgvInvoices.Columns["cardName"].HeaderText = "Item Name";
+                            dgvInvoices.Columns["setId"].HeaderText = "Set";
+                            dgvInvoices.Columns["timeMktPrice"].HeaderText = "Market Price";
+                            dgvInvoices.Columns["agreedPrice"].HeaderText = "Sold Price";
+                            dgvInvoices.Columns["amtTraded"].HeaderText = "Qty";
+                            dgvInvoices.Columns["saleDate"].HeaderText = "Sale Date";
+                            dgvInvoices.Columns["costIndv"].HeaderText = "Invoice Cost";
+
+                            // Color first two rows
+                            if (dgvInvoices.Rows.Count > 0)
+                                dgvInvoices.Rows[0].DefaultCellStyle.BackColor = Color.LightBlue;
+                            if (dgvInvoices.Rows.Count > 1)
+                                dgvInvoices.Rows[1].DefaultCellStyle.BackColor = Color.LightGray;
+
+                            gbProfit.Visible = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading sales comparison: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void SelectedCompareSalesRow()
+        {
+            // Only process if a valid sales row is selected (skip first two rows)
+            if (dgvInvoices.CurrentRow != null && dgvInvoices.CurrentRow.Index > 1)
+            {
+                var row = dgvInvoices.CurrentRow;
+
+                // Get saleDate and agreedPrice from the selected row
+                string saleDateStr = row.Cells["saleDate"].Value?.ToString();
+                decimal agreedPrice = 0;
+                decimal.TryParse(row.Cells["agreedPrice"].Value?.ToString(), out agreedPrice);
+
+                // Get costIndv from the invoice row (first row)
+                decimal invoiceCostIndv = 0;
+                if (dgvInvoices.Rows.Count > 0)
+                {
+                    decimal.TryParse(dgvInvoices.Rows[0].Cells["costIndv"].Value?.ToString(), out invoiceCostIndv);
+                }
+
+                // Calculate profit
+                decimal profit = invoiceCostIndv - agreedPrice;
+
+                // Display in gbProfit controls
+                lblSelectedDate.Text = saleDateStr;
+                lblSelectedProfit.Text = profit.ToString("C2");
+
+                // Optionally, display image if needed
+                string imageUrl = dgvInvoices.Rows[0].Cells["imageURL"].Value?.ToString();
+                if (pictureBoxItem != null && !string.IsNullOrEmpty(imageUrl))
+                {
+                    try { pictureBoxItem.Load(imageUrl); }
+                    catch { pictureBoxItem.Image = null; }
+                }
+            }
+        }
     }
-    }
+}
+   

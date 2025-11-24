@@ -36,14 +36,16 @@
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.dgvInvoices = new System.Windows.Forms.DataGridView();
             this.flpNewOrder = new System.Windows.Forms.FlowLayoutPanel();
-            this.btnStep2 = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
             this.cbCardGame = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.flpAddStep2 = new System.Windows.Forms.FlowLayoutPanel();
-            this.tbSelectSet = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.lblSelectedSet = new System.Windows.Forms.Label();
+            this.btnSearchSet = new System.Windows.Forms.Button();
+            this.tbSelectSet = new System.Windows.Forms.TextBox();
+            this.btnStep2 = new System.Windows.Forms.Button();
+            this.flpAddStep2 = new System.Windows.Forms.FlowLayoutPanel();
             this.label4 = new System.Windows.Forms.Label();
+            this.btnSearchItem = new System.Windows.Forms.Button();
             this.tbFindItem = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.tbQty = new System.Windows.Forms.TextBox();
@@ -63,17 +65,21 @@
             this.tbAmtRemoved = new System.Windows.Forms.TextBox();
             this.btnBack2FindItem = new System.Windows.Forms.Button();
             this.btnFinalizeInvoice = new System.Windows.Forms.Button();
-            this.btnFinalizeSkip = new System.Windows.Forms.Button();
             this.label12 = new System.Windows.Forms.Label();
-            this.btnBeginNewOrder = new System.Windows.Forms.Button();
-            this.btnSearchSet = new System.Windows.Forms.Button();
-            this.btnSearchItem = new System.Windows.Forms.Button();
-            this.pictureBoxItem = new System.Windows.Forms.PictureBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.btnSearchInvoices = new System.Windows.Forms.Button();
+            this.btnFinalizeSkip = new System.Windows.Forms.Button();
             this.DisplaySelectedItem = new System.Windows.Forms.FlowLayoutPanel();
+            this.pictureBoxItem = new System.Windows.Forms.PictureBox();
             this.lblSelectedItem = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnSearchInvoices = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.btnBeginNewOrder = new System.Windows.Forms.Button();
+            this.btnSeeSales = new System.Windows.Forms.Button();
+            this.gbProfit = new System.Windows.Forms.GroupBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.lblSelectedDate = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.lblSelectedProfit = new System.Windows.Forms.Label();
             this.panelTitle.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -81,9 +87,10 @@
             this.flpNewOrder.SuspendLayout();
             this.flpAddStep2.SuspendLayout();
             this.flpStock.SuspendLayout();
+            this.DisplaySelectedItem.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxItem)).BeginInit();
             this.groupBox1.SuspendLayout();
-            this.DisplaySelectedItem.SuspendLayout();
+            this.gbProfit.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnSettings
@@ -172,6 +179,7 @@
             this.dgvInvoices.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvInvoices.Location = new System.Drawing.Point(299, 3);
             this.dgvInvoices.Name = "dgvInvoices";
+            this.dgvInvoices.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvInvoices.Size = new System.Drawing.Size(956, 502);
             this.dgvInvoices.TabIndex = 0;
             this.dgvInvoices.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvInvoices_CellContentClick);
@@ -194,16 +202,14 @@
             this.flpNewOrder.TabIndex = 1;
             this.flpNewOrder.Visible = false;
             // 
-            // btnStep2
+            // label3
             // 
-            this.btnStep2.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnStep2.Location = new System.Drawing.Point(3, 103);
-            this.btnStep2.Name = "btnStep2";
-            this.btnStep2.Size = new System.Drawing.Size(108, 28);
-            this.btnStep2.TabIndex = 3;
-            this.btnStep2.Text = "Next";
-            this.btnStep2.UseVisualStyleBackColor = false;
-            this.btnStep2.Click += new System.EventHandler(this.btnStep2_Click);
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(3, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(93, 13);
+            this.label3.TabIndex = 6;
+            this.label3.Text = "Select Card Game";
             // 
             // cbCardGame
             // 
@@ -229,6 +235,45 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "Search Set: ";
             // 
+            // lblSelectedSet
+            // 
+            this.lblSelectedSet.AutoSize = true;
+            this.lblSelectedSet.Location = new System.Drawing.Point(75, 40);
+            this.lblSelectedSet.Name = "lblSelectedSet";
+            this.lblSelectedSet.Size = new System.Drawing.Size(0, 13);
+            this.lblSelectedSet.TabIndex = 7;
+            // 
+            // btnSearchSet
+            // 
+            this.btnSearchSet.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnSearchSet.Location = new System.Drawing.Point(81, 43);
+            this.btnSearchSet.Name = "btnSearchSet";
+            this.btnSearchSet.Size = new System.Drawing.Size(149, 28);
+            this.btnSearchSet.TabIndex = 9;
+            this.btnSearchSet.Text = "Search";
+            this.btnSearchSet.UseVisualStyleBackColor = false;
+            this.btnSearchSet.Click += new System.EventHandler(this.btnSearchSet_Click);
+            // 
+            // tbSelectSet
+            // 
+            this.tbSelectSet.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbSelectSet.Location = new System.Drawing.Point(3, 77);
+            this.tbSelectSet.Name = "tbSelectSet";
+            this.tbSelectSet.Size = new System.Drawing.Size(273, 20);
+            this.tbSelectSet.TabIndex = 5;
+            // 
+            // btnStep2
+            // 
+            this.btnStep2.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnStep2.Location = new System.Drawing.Point(3, 103);
+            this.btnStep2.Name = "btnStep2";
+            this.btnStep2.Size = new System.Drawing.Size(108, 28);
+            this.btnStep2.TabIndex = 3;
+            this.btnStep2.Text = "Next";
+            this.btnStep2.UseVisualStyleBackColor = false;
+            this.btnStep2.Click += new System.EventHandler(this.btnStep2_Click);
+            // 
             // flpAddStep2
             // 
             this.flpAddStep2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -251,32 +296,6 @@
             this.flpAddStep2.TabIndex = 4;
             this.flpAddStep2.Visible = false;
             // 
-            // tbSelectSet
-            // 
-            this.tbSelectSet.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbSelectSet.Location = new System.Drawing.Point(3, 77);
-            this.tbSelectSet.Name = "tbSelectSet";
-            this.tbSelectSet.Size = new System.Drawing.Size(273, 20);
-            this.tbSelectSet.TabIndex = 5;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(93, 13);
-            this.label3.TabIndex = 6;
-            this.label3.Text = "Select Card Game";
-            // 
-            // lblSelectedSet
-            // 
-            this.lblSelectedSet.AutoSize = true;
-            this.lblSelectedSet.Location = new System.Drawing.Point(75, 40);
-            this.lblSelectedSet.Name = "lblSelectedSet";
-            this.lblSelectedSet.Size = new System.Drawing.Size(0, 13);
-            this.lblSelectedSet.TabIndex = 7;
-            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -285,6 +304,17 @@
             this.label4.Size = new System.Drawing.Size(50, 13);
             this.label4.TabIndex = 0;
             this.label4.Text = "Find Item";
+            // 
+            // btnSearchItem
+            // 
+            this.btnSearchItem.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnSearchItem.Location = new System.Drawing.Point(59, 3);
+            this.btnSearchItem.Name = "btnSearchItem";
+            this.btnSearchItem.Size = new System.Drawing.Size(149, 28);
+            this.btnSearchItem.TabIndex = 10;
+            this.btnSearchItem.Text = "Search";
+            this.btnSearchItem.UseVisualStyleBackColor = false;
+            this.btnSearchItem.Click += new System.EventHandler(this.btnSearchItem_Click);
             // 
             // tbFindItem
             // 
@@ -471,6 +501,15 @@
             this.btnFinalizeInvoice.UseVisualStyleBackColor = false;
             this.btnFinalizeInvoice.Click += new System.EventHandler(this.btnFinalizeInvoice_Click);
             // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(3, 99);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(218, 13);
+            this.label12.TabIndex = 12;
+            this.label12.Text = "(Skip if items have not arived in the store yet)";
+            // 
             // btnFinalizeSkip
             // 
             this.btnFinalizeSkip.BackColor = System.Drawing.SystemColors.ControlLight;
@@ -482,46 +521,17 @@
             this.btnFinalizeSkip.UseVisualStyleBackColor = false;
             this.btnFinalizeSkip.Click += new System.EventHandler(this.btnFinalizeSkip_Click);
             // 
-            // label12
+            // DisplaySelectedItem
             // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(3, 99);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(218, 13);
-            this.label12.TabIndex = 12;
-            this.label12.Text = "(Skip if items have not arived in the store yet)";
-            // 
-            // btnBeginNewOrder
-            // 
-            this.btnBeginNewOrder.Location = new System.Drawing.Point(38, 18);
-            this.btnBeginNewOrder.Name = "btnBeginNewOrder";
-            this.btnBeginNewOrder.Size = new System.Drawing.Size(159, 60);
-            this.btnBeginNewOrder.TabIndex = 1;
-            this.btnBeginNewOrder.Text = "New Order";
-            this.btnBeginNewOrder.UseVisualStyleBackColor = true;
-            this.btnBeginNewOrder.Click += new System.EventHandler(this.btnBeginNewOrder_Click);
-            // 
-            // btnSearchSet
-            // 
-            this.btnSearchSet.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnSearchSet.Location = new System.Drawing.Point(81, 43);
-            this.btnSearchSet.Name = "btnSearchSet";
-            this.btnSearchSet.Size = new System.Drawing.Size(149, 28);
-            this.btnSearchSet.TabIndex = 9;
-            this.btnSearchSet.Text = "Search";
-            this.btnSearchSet.UseVisualStyleBackColor = false;
-            this.btnSearchSet.Click += new System.EventHandler(this.btnSearchSet_Click);
-            // 
-            // btnSearchItem
-            // 
-            this.btnSearchItem.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnSearchItem.Location = new System.Drawing.Point(59, 3);
-            this.btnSearchItem.Name = "btnSearchItem";
-            this.btnSearchItem.Size = new System.Drawing.Size(149, 28);
-            this.btnSearchItem.TabIndex = 10;
-            this.btnSearchItem.Text = "Search";
-            this.btnSearchItem.UseVisualStyleBackColor = false;
-            this.btnSearchItem.Click += new System.EventHandler(this.btnSearchItem_Click);
+            this.DisplaySelectedItem.Controls.Add(this.pictureBoxItem);
+            this.DisplaySelectedItem.Controls.Add(this.lblSelectedItem);
+            this.DisplaySelectedItem.Controls.Add(this.btnSeeSales);
+            this.DisplaySelectedItem.Controls.Add(this.gbProfit);
+            this.DisplaySelectedItem.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.DisplaySelectedItem.Location = new System.Drawing.Point(1261, 3);
+            this.DisplaySelectedItem.Name = "DisplaySelectedItem";
+            this.DisplaySelectedItem.Size = new System.Drawing.Size(217, 502);
+            this.DisplaySelectedItem.TabIndex = 2;
             // 
             // pictureBoxItem
             // 
@@ -532,6 +542,14 @@
             this.pictureBoxItem.Size = new System.Drawing.Size(208, 233);
             this.pictureBoxItem.TabIndex = 2;
             this.pictureBoxItem.TabStop = false;
+            // 
+            // lblSelectedItem
+            // 
+            this.lblSelectedItem.AutoSize = true;
+            this.lblSelectedItem.Location = new System.Drawing.Point(3, 239);
+            this.lblSelectedItem.Name = "lblSelectedItem";
+            this.lblSelectedItem.Size = new System.Drawing.Size(0, 13);
+            this.lblSelectedItem.TabIndex = 3;
             // 
             // groupBox1
             // 
@@ -546,13 +564,6 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "groupBox1";
             // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(235, 18);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(566, 20);
-            this.textBox1.TabIndex = 2;
-            // 
             // btnSearchInvoices
             // 
             this.btnSearchInvoices.Location = new System.Drawing.Point(808, 18);
@@ -563,23 +574,83 @@
             this.btnSearchInvoices.UseVisualStyleBackColor = true;
             this.btnSearchInvoices.Click += new System.EventHandler(this.btnSearchInvoices_Click);
             // 
-            // DisplaySelectedItem
+            // textBox1
             // 
-            this.DisplaySelectedItem.Controls.Add(this.pictureBoxItem);
-            this.DisplaySelectedItem.Controls.Add(this.lblSelectedItem);
-            this.DisplaySelectedItem.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DisplaySelectedItem.Location = new System.Drawing.Point(1261, 3);
-            this.DisplaySelectedItem.Name = "DisplaySelectedItem";
-            this.DisplaySelectedItem.Size = new System.Drawing.Size(217, 502);
-            this.DisplaySelectedItem.TabIndex = 2;
+            this.textBox1.Location = new System.Drawing.Point(235, 18);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(566, 20);
+            this.textBox1.TabIndex = 2;
             // 
-            // lblSelectedItem
+            // btnBeginNewOrder
             // 
-            this.lblSelectedItem.AutoSize = true;
-            this.lblSelectedItem.Location = new System.Drawing.Point(3, 239);
-            this.lblSelectedItem.Name = "lblSelectedItem";
-            this.lblSelectedItem.Size = new System.Drawing.Size(0, 13);
-            this.lblSelectedItem.TabIndex = 3;
+            this.btnBeginNewOrder.Location = new System.Drawing.Point(38, 18);
+            this.btnBeginNewOrder.Name = "btnBeginNewOrder";
+            this.btnBeginNewOrder.Size = new System.Drawing.Size(159, 60);
+            this.btnBeginNewOrder.TabIndex = 1;
+            this.btnBeginNewOrder.Text = "New Order";
+            this.btnBeginNewOrder.UseVisualStyleBackColor = true;
+            this.btnBeginNewOrder.Click += new System.EventHandler(this.btnBeginNewOrder_Click);
+            // 
+            // btnSeeSales
+            // 
+            this.btnSeeSales.Location = new System.Drawing.Point(9, 242);
+            this.btnSeeSales.Name = "btnSeeSales";
+            this.btnSeeSales.Size = new System.Drawing.Size(75, 23);
+            this.btnSeeSales.TabIndex = 4;
+            this.btnSeeSales.Text = "See Sales";
+            this.btnSeeSales.UseVisualStyleBackColor = true;
+            this.btnSeeSales.Visible = false;
+            this.btnSeeSales.Click += new System.EventHandler(this.btnSeeSales_Click);
+            // 
+            // gbProfit
+            // 
+            this.gbProfit.Controls.Add(this.lblSelectedProfit);
+            this.gbProfit.Controls.Add(this.label14);
+            this.gbProfit.Controls.Add(this.lblSelectedDate);
+            this.gbProfit.Controls.Add(this.label13);
+            this.gbProfit.Location = new System.Drawing.Point(3, 271);
+            this.gbProfit.Name = "gbProfit";
+            this.gbProfit.Size = new System.Drawing.Size(208, 181);
+            this.gbProfit.TabIndex = 5;
+            this.gbProfit.TabStop = false;
+            this.gbProfit.Text = "Profit";
+            this.gbProfit.Visible = false;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(6, 19);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(36, 13);
+            this.label13.TabIndex = 0;
+            this.label13.Text = "Date: ";
+            // 
+            // lblSelectedDate
+            // 
+            this.lblSelectedDate.AutoSize = true;
+            this.lblSelectedDate.Location = new System.Drawing.Point(49, 19);
+            this.lblSelectedDate.Name = "lblSelectedDate";
+            this.lblSelectedDate.Size = new System.Drawing.Size(63, 13);
+            this.lblSelectedDate.TabIndex = 1;
+            this.lblSelectedDate.Text = "Select Date";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(6, 54);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(37, 13);
+            this.label14.TabIndex = 2;
+            this.label14.Text = "Profit: ";
+            // 
+            // lblSelectedProfit
+            // 
+            this.lblSelectedProfit.AutoSize = true;
+            this.lblSelectedProfit.Location = new System.Drawing.Point(49, 54);
+            this.lblSelectedProfit.Name = "lblSelectedProfit";
+            this.lblSelectedProfit.Size = new System.Drawing.Size(49, 13);
+            this.lblSelectedProfit.TabIndex = 3;
+            this.lblSelectedProfit.Text = "Profit$$$";
             // 
             // Invoice
             // 
@@ -604,11 +675,13 @@
             this.flpAddStep2.PerformLayout();
             this.flpStock.ResumeLayout(false);
             this.flpStock.PerformLayout();
+            this.DisplaySelectedItem.ResumeLayout(false);
+            this.DisplaySelectedItem.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxItem)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            this.DisplaySelectedItem.ResumeLayout(false);
-            this.DisplaySelectedItem.PerformLayout();
+            this.gbProfit.ResumeLayout(false);
+            this.gbProfit.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -661,5 +734,11 @@
         private System.Windows.Forms.Button btnSearchInvoices;
         private System.Windows.Forms.FlowLayoutPanel DisplaySelectedItem;
         private System.Windows.Forms.Label lblSelectedItem;
+        private System.Windows.Forms.Button btnSeeSales;
+        private System.Windows.Forms.GroupBox gbProfit;
+        private System.Windows.Forms.Label lblSelectedProfit;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label lblSelectedDate;
+        private System.Windows.Forms.Label label13;
     }
 }
