@@ -142,5 +142,13 @@ namespace Demo_Application_1
             addInv.Show();
             this.Hide();
         }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            //Open Invoices tab
+            Form invoice = new Invoice(connString, this);
+            invoice.Show();
+            this.Hide();
+        }
     }
 }
