@@ -16,6 +16,7 @@ using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -334,21 +335,34 @@ namespace Demo_Application_1
 
         }
 
-        private void PriceCheck ()
+        private void PriceCheck()
         {
             try
             {
-                //Load the TCGPlayer page from the url entered in the textbox
                 driver.Navigate().GoToUrl(selectedPriceURL);
 
-                //Find the market price table when its finished loading
-                IWebElement priceElement = wait.Until(ExpectedConditions.ElementIsVisible(
-                    By.CssSelector("span.price-points__upper__price")));
+                // Wait until price is visible AND has non-empty text
+                var priceElement = wait.Until(driver =>
+                {
+                    try
+                    {
+                        var el = driver.FindElement(By.CssSelector("span.price-points__upper__price"));
+                        if (el != null && el.Displayed && !string.IsNullOrWhiteSpace(el.Text))
+                            return el;
+                    }
+                    catch { }
+                    return null;
+                });
 
-                //Change the "Market Price" text to the actual market price
-                //Unnessisarily complicated cuz the dollar sign was causing issues (will fix later)
-                string rawPrice = priceElement.Text.Trim().Replace("$", "").Replace(",", "");
+                // (Optional but recommended)
+                Thread.Sleep(1200); // let Vue finish binding text
+
+                string rawPrice = priceElement.Text.Trim()
+                                                    .Replace("$", "")
+                                                    .Replace(",", "");
+
                 selectedMktPrice = double.Parse(rawPrice, System.Globalization.CultureInfo.InvariantCulture);
+
                 lblMktPrice.Text = "Market Price: " + selectedMktPrice.ToString("C2", System.Globalization.CultureInfo.CreateSpecificCulture("en-US"));
                 TransactionPriceLogic();
                 tbPrice.Text = transactionPrice.ToString("C2");
@@ -356,18 +370,18 @@ namespace Demo_Application_1
                 selectedPriceUp2Date = true;
                 lblMktPrice.Font = new Font(lblMktPrice.Font, FontStyle.Regular);
 
-                //Update row in database
                 UpdateDBwPriceCheck();
             }
-            catch(WebDriverTimeoutException)
+            catch (WebDriverTimeoutException)
             {
-                MessageBox.Show("Price not found in time");
+                MessageBox.Show("Price not found in time. The page may have loaded too slowly.");
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error: {ex.Message}");
             }
         }
+
 
         private void UpdateDBwPriceCheck()
         {
@@ -412,15 +426,29 @@ namespace Demo_Application_1
 
         private void BackgroundBrowser()
         {
-            //Open up a chrome browser in the background (needed without TCGPlayer API)
             ChromeOptions options = new ChromeOptions();
-            options.AddArgument("--headless"); // Run in background
+
+            // DO NOT USE OLD HEADLESS MODE
+            // options.AddArgument("--headless");
+
+            // If you really need headless, use the new one:
+            options.AddArgument("--headless=new");
+
             options.AddArgument("--disable-gpu");
             options.AddArgument("--no-sandbox");
 
+            // Pretend to be a normal browser
+            options.AddArgument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36");
+
+            // Anti-bot bypass
+            options.AddExcludedArgument("enable-automation");
+            options.AddAdditionalOption("useAutomationExtension", false);
+            options.AddArgument("--disable-blink-features=AutomationControlled");
+
             driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
         }
+
 
         private void btnAddCt_MouseDown(object sender, MouseEventArgs e)
         {
